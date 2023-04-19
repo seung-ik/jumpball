@@ -20,9 +20,13 @@ const HomeLayout: React.FC<Props> = ({ children }) => {
 };
 
 const Layout = styled('section')`
-  min-height: 100vh;
-  width: 1024px;
-  margin: 0 auto;
+  max-width: 1024px;
+  margin: auto;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 export default HomeLayout;
