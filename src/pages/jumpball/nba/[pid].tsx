@@ -10,7 +10,10 @@ interface DetailGameInfoType {
   gameNote: string;
   home: any;
   away: any;
+  boxscore_home: any;
+  boxscore_away: any;
 }
+
 const DetailPage = () => {
   const router = useRouter();
   const { pid } = router.query;
@@ -28,11 +31,15 @@ const DetailPage = () => {
             gameNote: data.header.gameNote,
             home: data.header.competitions[0].competitors[0],
             away: data.header.competitions[0].competitors[1],
+            boxscore_home: data.boxscore.teams[0].statistics,
+            boxscore_away: data.boxscore.teams[1].statistics,
           };
           setData(_data);
         });
     }
   }, [pid]);
+
+  if (!data) return;
 
   return (
     <div
@@ -135,6 +142,17 @@ const DetailPage = () => {
           </tbody>
         </Table>
       )}
+      <div></div>
+      {data.boxscore_home.length > 0 &&
+        data.boxscore_home.map((el: any, i: number) => {
+          return (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>{data.boxscore_home[i]['displayValue']}</div>
+              <div>{el.label}</div>
+              <div>{data.boxscore_away[i]['displayValue']}</div>
+            </div>
+          );
+        })}
     </div>
   );
 };
