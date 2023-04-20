@@ -15,11 +15,15 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".",
+    "typeRoots": ["@types"],
     "paths": {
       "@components/*": ["./src/components/*"],
       "@layout/*": ["./src/layout/*"],
-      "@page/*": ["./src/page/*"],
+      "@pages/*": ["./src/pages/*"],
       "@styles/*": ["./src/styles/*"],
+      "@store/*": ["./src/store/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@utils/*": ["./src/utils/*"],
       "@/*": ["./src/*"]
     }
   },

@@ -6,6 +6,9 @@ const nextConfig = {
       ssr: true,
     },
   },
+  images: {
+    domains: ['a.espncdn.com'],
+  },
 };
 
 module.exports = nextConfig;
