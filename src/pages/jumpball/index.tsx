@@ -35,6 +35,7 @@ const JumpBall = () => {
         )}`,
       )
       .then(({ data }) => {
+        console.log(data);
         const _list = data.events.map((event: any) => normalizeGameInfo(event));
         setGameList(_list);
       });

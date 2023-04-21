@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import Image from 'next/image';
 import GamePrediction from '@components/jumpball/GamePrediction';
+import { format } from 'date-fns';
 
 interface DetailGameInfoType {
   id: string;
@@ -12,29 +13,55 @@ interface DetailGameInfoType {
   away: any;
   boxscore_home: any;
   boxscore_away: any;
+  lastGames_home: any;
+  lastGames_away: any;
+  isStarted: boolean;
 }
 
 const DetailPage = () => {
   const router = useRouter();
   const { pid } = router.query;
   const [data, setData] = useState<DetailGameInfoType>();
-  const scoreList = data?.home.linescores?.length < 4 ? [0, 1, 2, 3] : data?.home.linescores;
+  const scoreList = useMemo(() => {
+    if (!data?.home.linescores || data?.home.linescores.length < 4) return [0, 1, 2, 3];
+    return data?.home.linescores;
+  }, [data]);
+  console.log(data);
 
   useEffect(() => {
     if (pid) {
       axios
         .get(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${pid}`)
         .then(({ data }) => {
-          console.log(data);
-          const _data: DetailGameInfoType = {
-            id: data.header.id,
-            gameNote: data.header.gameNote,
-            home: data.header.competitions[0].competitors[0],
-            away: data.header.competitions[0].competitors[1],
-            boxscore_home: data.boxscore.teams[0].statistics,
-            boxscore_away: data.boxscore.teams[1].statistics,
-          };
-          setData(_data);
+          const gameDate = data.header.competitions[0].date;
+
+          if (new Date(gameDate) < new Date()) {
+            const _data: DetailGameInfoType = {
+              id: data.header.id,
+              gameNote: data.header.gameNote,
+              home: data.header.competitions[0].competitors[0],
+              away: data.header.competitions[0].competitors[1],
+              boxscore_home: data.boxscore.teams[0].statistics,
+              boxscore_away: data.boxscore.teams[1].statistics,
+              lastGames_home: '',
+              lastGames_away: '',
+              isStarted: new Date(gameDate) < new Date(),
+            };
+            setData(_data);
+          } else {
+            const _data: DetailGameInfoType = {
+              id: data.header.id,
+              gameNote: data.header.gameNote,
+              home: data.header.competitions[0].competitors[0],
+              away: data.header.competitions[0].competitors[1],
+              boxscore_home: data.boxscore.teams[0].statistics,
+              boxscore_away: data.boxscore.teams[1].statistics,
+              lastGames_home: data.lastFiveGames[0].events.reverse(),
+              lastGames_away: data.lastFiveGames[1].events.reverse(),
+              isStarted: new Date(gameDate) < new Date(),
+            };
+            setData(_data);
+          }
         });
     }
   }, [pid]);
@@ -54,8 +81,7 @@ const DetailPage = () => {
         padding: '24px',
       }}
     >
-      <button onClick={() => router.back()}>뒤로</button>
-      <div>{pid}</div>
+      <button onClick={() => router.push('/jumpball')}>경기일정</button>
       <div>{data?.gameNote}</div>
       <div style={{ display: 'flex', marginTop: '40px' }}>
         <div
@@ -112,17 +138,27 @@ const DetailPage = () => {
           </thead>
           <tbody>
             {scoreList.map((_: any, i: number) => {
-              const homeScore = data?.home.linescores[i].displayValue;
-              const awayScore = data?.away.linescores[i].displayValue;
-
-              const homeAccScore = data?.home.linescores
-                .slice(0, i + 1)
-                .map((el: any) => Number(el.displayValue))
-                .reduce((acc: number, cur: number) => acc + cur, 0);
-              const awayAccScore = data?.away.linescores
-                .slice(0, i + 1)
-                .map((el: any) => Number(el.displayValue))
-                .reduce((acc: number, cur: number) => acc + cur, 0);
+              let homeScore;
+              let awayScore;
+              let homeAccScore;
+              let awayAccScore;
+              if (!data?.home.linescores[i]) {
+                homeScore = 0;
+                awayScore = 0;
+                homeAccScore = 0;
+                awayAccScore = 0;
+              } else {
+                homeScore = data?.home.linescores[i].displayValue;
+                awayScore = data?.away.linescores[i].displayValue;
+                homeAccScore = data?.home.linescores
+                  .slice(0, i + 1)
+                  .map((el: any) => Number(el.displayValue))
+                  .reduce((acc: number, cur: number) => acc + cur, 0);
+                awayAccScore = data?.away.linescores
+                  .slice(0, i + 1)
+                  .map((el: any) => Number(el.displayValue))
+                  .reduce((acc: number, cur: number) => acc + cur, 0);
+              }
 
               return (
                 <tr>
@@ -142,7 +178,6 @@ const DetailPage = () => {
           </tbody>
         </Table>
       )}
-      <div></div>
       {data.boxscore_home.length > 0 &&
         data.boxscore_home.map((el: any, i: number) => {
           return (
@@ -153,6 +188,54 @@ const DetailPage = () => {
             </div>
           );
         })}
+      {data.lastGames_home && (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            {data.lastGames_home.map((el: any) => {
+              const date = format(new Date(el.gameDate), 'yyyy-MM-dd');
+              return (
+                <div
+                  style={{
+                    border: '1px solid black',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>{el.gameResult}</div>
+                  <div>{el.score}</div>
+                  <div onClick={() => router.push(`/jumpball/nba/${el.id}`)}>
+                    <div>{el.opponent.displayName}</div>
+                    <div>{date}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ flex: 1 }}>
+            {data.lastGames_away.map((el: any) => {
+              const date = format(new Date(el.gameDate), 'yyyy-MM-dd');
+              return (
+                <div
+                  style={{
+                    border: '1px solid black',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>{el.gameResult}</div>
+                  <div>{el.score}</div>
+                  <div onClick={() => router.push(`/jumpball/nba/${el.id}`)}>
+                    <div>{el.opponent.displayName}</div>
+                    <div>{date}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

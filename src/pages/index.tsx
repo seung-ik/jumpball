@@ -47,7 +47,7 @@ const Header = styled('div')`
   user-select: none;
 `;
 const Box = styled('div')<{ grow?: number }>`
-  background-color: #2d984a;
+  border: 2px solid #2d984a;
   flex: ${({ grow }) => grow || 1};
   height: 100%;
   border-radius: 36px;
