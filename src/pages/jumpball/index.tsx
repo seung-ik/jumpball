@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { addDays, format, subDays } from 'date-fns';
+import styled from 'styled-components';
+import { BsArrowLeftSquare, BsArrowRightSquare } from 'react-icons/bs';
 import GameItem from '@components/jumpball/GameItem';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { fetchScoreBoardByDate } from '@utils/fetch';
+import TabButton from '@atoms/TabButton';
+import NoGames from '@components/jumpball/NoGames';
+
 export interface NBAEventType {
   id: string;
   completed: boolean;
@@ -11,84 +17,122 @@ export interface NBAEventType {
   awayTeam: any;
 }
 
+export type JumpBallTab = 'NBA' | 'MLB' | 'MY';
+
 const JumpBall = () => {
-  const [date, setDate] = useState(new Date());
-  const [gameList, setGameList] = useState([]);
-  const normalizeGameInfo = (info: any): NBAEventType => {
-    // console.log(info);
-    const _info: NBAEventType = {
-      id: info.id,
-      completed: info.status.type.completed,
-      name: info.name,
-      shortName: info.shortName,
-      homeTeam: info.competitions[0].competitors[0],
-      awayTeam: info.competitions[0].competitors[1],
-    };
-    return _info;
-  };
+  const [date, setDate] = useState<Date>(new Date());
+  const [tab, setTab] = useState<JumpBallTab>('NBA');
+  const [gameList, setGameList] = useState<NBAEventType[]>([]);
+
+  const onClickTodayDate = () => setDate(new Date());
+  const onClickSubDate = () => setDate(subDays(date, 1));
+  const onClickAddDate = () => setDate(addDays(date, 1));
+
+  const handleTab = (_value: JumpBallTab) => setTab(_value);
+
   useEffect(() => {
-    axios
-      .get(
-        `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${format(
-          date,
-          'yyyyMMdd',
-        )}`,
-      )
-      .then(({ data }) => {
-        console.log(data);
-        const _list = data.events.map((event: any) => normalizeGameInfo(event));
-        setGameList(_list);
-      });
+    const getGameList = async () => {
+      const gameList = await fetchScoreBoardByDate(date);
+      setGameList(gameList);
+    };
+    getGameList();
   }, [date]);
 
   return (
-    <div
-      style={{
-        borderLeft: '1px solid gray',
-        borderRight: '2px solid black',
-        maxWidth: '1040px',
-        display: 'flex',
-        flexDirection: 'column',
-        margin: 'auto',
-        minHeight: '100vh',
-        padding: '24px',
-      }}
-    >
-      <div style={{ display: 'flex', width: '300px', justifyContent: 'space-between' }}>
-        <button>nba</button>
-        <button>mlb</button>
-      </div>
-      <div style={{ display: 'flex', marginTop: '30px' }}>
-        <button
-          onClick={() => {
-            const _date = subDays(date, 1);
-            setDate(_date);
-          }}
-        >
-          뒤로
-        </button>
-        <div>{format(date, 'MM/dd')}</div>
-        <button
-          onClick={() => {
-            const _date = addDays(date, 1);
-            setDate(_date);
-          }}
-        >
-          앞으로
-        </button>
-        <button onClick={() => setDate(new Date())}>오늘로이동</button>
-      </div>
-      <section style={{ marginTop: '40px' }}>
-        <h1>경기일정</h1>
-        <ul>
-          {gameList.length === 0 && <div>일정이 없습니다.</div>}
-          {gameList.map((game: any) => {
-            return <GameItem key={game.id} {...game} />;
-          })}
-        </ul>
-      </section>
-    </div>
+    <Layout>
+      <Header>
+        <TabButton tab={tab} handleTab={handleTab} name="NBA" value="NBA" />
+        <TabButton tab={tab} handleTab={handleTab} name="MLB" value="MLB" />
+        <TabButton tab={tab} handleTab={handleTab} name="나의 예측" value="MY" />
+      </Header>
+      <Body>
+        <Row>
+          <button onClick={onClickTodayDate}>오늘의 경기일정</button>
+          <DateWrapper>
+            <BsArrowLeftSquare size={36} onClick={onClickSubDate} />
+            <span className="date-text">{format(date, 'MM / dd')}</span>
+            <BsArrowRightSquare size={36} onClick={onClickAddDate} />
+          </DateWrapper>
+        </Row>
+        {gameList.length === 0 && <NoGames />}
+        {gameList.map((game: any) => (
+          <GameItem key={game.id} {...game} />
+        ))}
+      </Body>
+    </Layout>
   );
 };
 
 export default JumpBall;
+
+const Layout = styled('div')`
+  border-left: 1px solid ${TRANS_GREEN};
+  border-right: 1px solid ${TRANS_GREEN};
+  max-width: ${MAX_WIDTH}px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  min-height: 100vh;
+  padding: 0 4px;
+`;
+
+const Header = styled('header')`
+  display: flex;
+  justify-content: space-between;
+  height: 72px;
+
+  & > button {
+    flex: 1;
+    border-bottom: 4px solid ${TRANS_GREEN};
+    font-size: 28px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  & > button.active {
+    border-bottom: 4px solid ${PRIMARY_COLOR};
+    color: green;
+  }
+`;
+
+const Body = styled('section')`
+  margin-top: 80px;
+  padding: 0 24px;
+`;
+
+const DateWrapper = styled('div')`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & .date-text {
+    font-size: 28px;
+    min-width: 120px;
+    text-align: center;
+  }
+`;
+
+const Row = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+
+  & > button {
+    background: none;
+    border: 2px solid black;
+    font-size: 20px;
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  & > button:hover {
+    background: ${TRANS_GREEN};
+  }
+
+  & > button:active {
+    transform: scale(0.98);
+  }
+`;

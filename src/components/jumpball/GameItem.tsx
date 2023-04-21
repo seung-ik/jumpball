@@ -1,19 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { NBAEventType } from '@pages/jumpball';
 import ScoreBoard from './ScoreBoard';
+import { TRANS_GREEN } from '@constants/style';
 
 const GameItem: React.FC<NBAEventType> = (props) => {
   const { shortName, name, completed, homeTeam, awayTeam, id } = props;
   const router = useRouter();
   const [active, setActive] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (completed) {
+      setActive(true);
+    }
+  }, [completed]);
+
   return (
     <div
-      style={{ border: '1px solid red', height: 'auto', padding: '8px', marginBottom: '20px' }}
+      style={{
+        border: `2px solid ${TRANS_GREEN}`,
+        borderRadius: '16px',
+        height: 'auto',
+        padding: '8px',
+        marginBottom: '20px',
+        background: 'white',
+      }}
       onClick={() => setActive((prev) => !prev)}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          height: '52px',
+          alignItems: 'center',
+          padding: '0 16px',
+          fontSize: '20px',
+        }}
+      >
         <div style={{ minWidth: '300px' }}>{name}</div>
         <div>isCompleted: {completed ? 'O' : 'X'}</div>
       </div>

@@ -18,6 +18,8 @@
     "typeRoots": ["@types"],
     "paths": {
       "@components/*": ["./src/components/*"],
+      "@atoms/*": ["./src/components/atoms/*"],
+      "@articles/*": ["./src/components/articles/*"],
       "@layout/*": ["./src/layout/*"],
       "@pages/*": ["./src/pages/*"],
       "@styles/*": ["./src/styles/*"],

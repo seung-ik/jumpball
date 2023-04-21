@@ -16,3 +16,7 @@ export function parseChainId(_id: number): string | boolean {
       return false;
   }
 }
+
+export const parseTimeToUsTime = (_date: Date) => {
+  return new Date(_date.getTime() - 24 * 60 * 60 * 1000);
+};

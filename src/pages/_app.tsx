@@ -4,7 +4,7 @@ import store from '@store/index';
 import RootLayout from '@layout/RootLayout';
 import GlobalStyle from '@styles/GlobalStyle';
 import dynamic from 'next/dynamic';
-const UserStatus = dynamic(() => import('../components/UserStatus'), {
+const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
   ssr: false,
 });
 
