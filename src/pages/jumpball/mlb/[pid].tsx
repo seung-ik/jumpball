@@ -1,10 +1,8 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 import GamePrediction from '@components/jumpball/GamePrediction';
-import { format } from 'date-fns';
-import { fetchNbaSummaryById } from '@utils/fetch';
+import { fetchMlbSummaryById } from '@utils/fetch';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import { IoIosArrowBack } from 'react-icons/io';
 import NbaTable from '@components/jumpball/NbaTable';
@@ -12,7 +10,7 @@ import NbaStatistics from '@components/jumpball/NbaStatistics';
 import NbaLatestGames from '@components/jumpball/NbaLatestGames';
 
 export interface DetailGameInfoType {
-  type: 'NBA' | 'MLB';
+  type: 'MLB' | 'NBA';
   id: string;
   gameNote: string;
   home: any;
@@ -24,7 +22,7 @@ export interface DetailGameInfoType {
   isStarted: boolean;
 }
 
-const NbaPage = () => {
+const MlbPage = () => {
   const router = useRouter();
   const { pid } = router.query;
   const [data, setData] = useState<DetailGameInfoType>();
@@ -35,7 +33,7 @@ const NbaPage = () => {
 
   useEffect(() => {
     const getData = async (_id: string) => {
-      const _data = await fetchNbaSummaryById(_id);
+      const _data = await fetchMlbSummaryById(_id);
       setData(_data);
     };
     if (pid) {
@@ -62,7 +60,7 @@ const NbaPage = () => {
   );
 };
 
-export default NbaPage;
+export default MlbPage;
 
 const Layout = styled('div')`
   border-left: 1px solid ${TRANS_GREEN};

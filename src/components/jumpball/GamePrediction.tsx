@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useAppSelector } from '@store/index';
 
 interface Props {
   isHome: boolean;
+  data: any;
 }
 
-const GamePrediction: React.FC<Props> = ({ isHome }) => {
+const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
   const homeTotal = 1000;
   const awayTotal = 2000;
   const homeDivideRate = (homeTotal + awayTotal) / homeTotal;
@@ -30,7 +32,25 @@ const GamePrediction: React.FC<Props> = ({ isHome }) => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        border: '1px solid black',
+        justifyContent: 'center',
+      }}
+    >
+      <Image
+        src={data.team.logos[0].href}
+        alt="aa"
+        width={120}
+        height={120}
+        style={{ objectFit: 'contain', flex: 1 }}
+      />
+      <div>{data.team.displayName}</div>
+      <div>{data.record[0].summary}</div>
       <section style={{ display: 'flex', border: '1px solid black', width: '100%' }}>
         <div
           style={{
@@ -103,7 +123,7 @@ const GamePrediction: React.FC<Props> = ({ isHome }) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

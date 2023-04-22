@@ -5,7 +5,7 @@ import MyTab from '@components/jumpball/MyTab';
 import GameTab from '@components/jumpball/GameTab';
 import TabButton from '@atoms/TabButton';
 import { fetchScoreBoardByDate } from '@utils/fetch';
-import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH, SECONDARY_COLOR } from '@constants/style';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 
 export interface NBAEventType {
   id: string;
@@ -16,6 +16,7 @@ export interface NBAEventType {
   awayTeam: any;
   location: string;
   date: string;
+  type: 'NBA' | 'MLB';
 }
 
 export type JumpBallTab = 'NBA' | 'MLB' | 'MY';
@@ -97,7 +98,7 @@ const Header = styled('header')`
 
   & > button.active {
     border-bottom: 4px solid ${PRIMARY_COLOR};
-    color: green;
+    color: ${PRIMARY_COLOR};
   }
 `;
 

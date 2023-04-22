@@ -16,6 +16,7 @@ const GameItem: React.FC<NBAEventType> = ({
   id,
   location,
   date,
+  type,
 }) => {
   const router = useRouter();
   const [active, setActive] = useState<boolean>(false);
@@ -23,7 +24,8 @@ const GameItem: React.FC<NBAEventType> = ({
   const onClickBoxToggle = () => setActive((prev) => !prev);
   const onClickDetailPage: React.MouseEventHandler<HTMLElement> = (e) => {
     e.stopPropagation();
-    router.push(`/jumpball/nba/${id}`);
+    if (type === 'MLB') router.push(`/jumpball/mlb/${id}`);
+    if (type === 'NBA') router.push(`/jumpball/nba/${id}`);
   };
 
   useEffect(() => {
