@@ -1,3 +1,4 @@
+import { THIRD_COLOR } from '@constants/style';
 import React from 'react';
 import { CgToolbox } from 'react-icons/cg';
 
@@ -15,7 +16,7 @@ const InstallWallet = () => {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '8px',
-        background: '#fc6238',
+        background: `${THIRD_COLOR}`,
         borderRadius: '7px',
       }}
       onClick={() =>

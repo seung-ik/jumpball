@@ -1,9 +1,10 @@
 import axios from 'axios';
-import {  format } from 'date-fns';
+import { format } from 'date-fns';
 import { NBAEventType } from '@pages/jumpball';
 import { parseTimeToUsTime } from './parser';
 
 const normalizeGameInfo = (info: any): NBAEventType => {
+  console.log(info);
   const _info: NBAEventType = {
     id: info.id,
     completed: info.status.type.completed,
@@ -11,6 +12,8 @@ const normalizeGameInfo = (info: any): NBAEventType => {
     shortName: info.shortName,
     homeTeam: info.competitions[0].competitors[0],
     awayTeam: info.competitions[0].competitors[1],
+    location: info.competitions[0].venue.fullName,
+    date: info.date,
   };
   return _info;
 };

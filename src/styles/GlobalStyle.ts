@@ -7,6 +7,10 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  body {
+    background-color: #f8f8f8;
+  }
+
   button {
     border: none;
     outline: none;
@@ -14,6 +18,7 @@ const GlobalStyle = createGlobalStyle`
     box-shadow: none;
     cursor: pointer;
   }
+
 `;
 
 export default GlobalStyle;

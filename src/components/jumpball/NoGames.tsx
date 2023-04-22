@@ -10,11 +10,11 @@ const NoGames = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '32px',
+        gap: '52px',
       }}
     >
-      <Image src="/images/rest.png" alt="rest" width={300} height={300} />
-      <div style={{ fontSize: '24px' }}>오늘은 경기일정이 없습니다...</div>
+      <Image src="/images/rest.png" alt="rest" width={250} height={250} />
+      <div style={{ fontSize: '24px' }}>오늘은 경기일정이 없습니다.</div>
     </div>
   );
 };

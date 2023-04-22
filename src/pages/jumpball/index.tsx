@@ -3,7 +3,7 @@ import { addDays, format, subDays } from 'date-fns';
 import styled from 'styled-components';
 import { BsArrowLeftSquare, BsArrowRightSquare } from 'react-icons/bs';
 import GameItem from '@components/jumpball/GameItem';
-import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH, SECONDARY_COLOR } from '@constants/style';
 import { fetchScoreBoardByDate } from '@utils/fetch';
 import TabButton from '@atoms/TabButton';
 import NoGames from '@components/jumpball/NoGames';
@@ -15,6 +15,8 @@ export interface NBAEventType {
   shortName: string;
   homeTeam: any;
   awayTeam: any;
+  location: string;
+  date: string;
 }
 
 export type JumpBallTab = 'NBA' | 'MLB' | 'MY';
@@ -49,9 +51,9 @@ const JumpBall = () => {
         <Row>
           <button onClick={onClickTodayDate}>오늘의 경기일정</button>
           <DateWrapper>
-            <BsArrowLeftSquare size={36} onClick={onClickSubDate} />
+            <BsArrowLeftSquare size={32} onClick={onClickSubDate} />
             <span className="date-text">{format(date, 'MM / dd')}</span>
-            <BsArrowRightSquare size={36} onClick={onClickAddDate} />
+            <BsArrowRightSquare size={32} onClick={onClickAddDate} />
           </DateWrapper>
         </Row>
         {gameList.length === 0 && <NoGames />}
@@ -80,11 +82,12 @@ const Header = styled('header')`
   display: flex;
   justify-content: space-between;
   height: 72px;
+  gap: 4px;
 
   & > button {
     flex: 1;
     border-bottom: 4px solid ${TRANS_GREEN};
-    font-size: 28px;
+    font-size: 24px;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -99,6 +102,7 @@ const Header = styled('header')`
 
 const Body = styled('section')`
   margin-top: 80px;
+  margin-bottom: 140px;
   padding: 0 24px;
 `;
 
@@ -108,7 +112,7 @@ const DateWrapper = styled('div')`
   justify-content: space-between;
 
   & .date-text {
-    font-size: 28px;
+    font-size: 24px;
     min-width: 120px;
     text-align: center;
   }
@@ -121,15 +125,15 @@ const Row = styled('div')`
   margin-bottom: 40px;
 
   & > button {
-    background: none;
-    border: 2px solid black;
+    background: ${PRIMARY_COLOR};
+    color: white;
     font-size: 20px;
-    padding: 8px 12px;
+    padding: 8px 20px;
     border-radius: 12px;
   }
 
   & > button:hover {
-    background: ${TRANS_GREEN};
+    opacity: 0.9;
   }
 
   & > button:active {
