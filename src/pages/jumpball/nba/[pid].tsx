@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 import GamePrediction from '@components/jumpball/GamePrediction';
 import { format } from 'date-fns';
 import { fetchNbaSummaryById } from '@utils/fetch';
@@ -9,7 +8,6 @@ import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import { IoIosArrowBack } from 'react-icons/io';
 import NbaTable from '@components/jumpball/NbaTable';
 import NbaStatistics from '@components/jumpball/NbaStatistics';
-import NbaLatestGames from '@components/jumpball/NbaLatestGames';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -22,16 +20,15 @@ export interface DetailGameInfoType {
   lastGames_home: any;
   lastGames_away: any;
   isStarted: boolean;
+  date: any;
+  location: string;
+  series: any[];
 }
 
 const NbaPage = () => {
   const router = useRouter();
   const { pid } = router.query;
   const [data, setData] = useState<DetailGameInfoType>();
-  const isStarted = useMemo(() => {
-    if (!data) return false;
-    return data.boxscore_home.length > 0;
-  }, [data]);
 
   useEffect(() => {
     const getData = async (_id: string) => {
@@ -50,14 +47,37 @@ const NbaPage = () => {
         <IoIosArrowBack />
         <span>경기일정</span>
       </Header>
-      <div>{data?.gameNote}</div>
-      <div style={{ display: 'flex', marginTop: '40px' }}>
-        <GamePrediction isHome data={data.home} />
-        <GamePrediction isHome={false} data={data.away} />
-      </div>
-      {isStarted && <NbaTable data={data} />}
-      {isStarted && <NbaStatistics data={data} />}
-      {!isStarted && <NbaLatestGames data={data} />}
+      <Body>
+        <Info>
+          <div>
+            <div className="info-title">{data?.gameNote || 'Regular Season'}</div>
+            <div className="info-text">
+              경기시간 : {format(new Date(data.date), 'MM월dd일 hh:mm')} | 경기장: {data.location}
+            </div>
+          </div>
+          <div className="series-wrapper">
+            {data.series.map((el) => {
+              return (
+                <div key={el.summary}>
+                  <div className="info-title" style={{ marginBottom: '4px' }}>
+                    {el.title}
+                  </div>
+                  <div className="info-text">{el.summary}</div>
+                </div>
+              );
+            })}
+          </div>
+        </Info>
+
+        <div style={{ display: 'flex', gap: '3px', marginTop: '24px' }}>
+          <GamePrediction isHome data={data} />
+          <GamePrediction isHome={false} data={data} />
+        </div>
+
+        {data.isStarted && <NbaTable data={data} />}
+        {data.isStarted && <NbaStatistics data={data} />}
+        {/* {!data.isStarted && <NbaLatestGames data={data} />} */}
+      </Body>
     </Layout>
   );
 };
@@ -86,5 +106,32 @@ const Header = styled('button')`
 
   & span {
     margin-left: 16px;
+  }
+`;
+
+const Body = styled('div')`
+  padding: 0 24px;
+  margin-top: 50px;
+`;
+
+const Info = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+
+  & .info-title {
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  & .info-text {
+    color: gray;
+  }
+
+  & .series-wrapper {
+    display: flex;
+    text-align: right;
+    flex-direction: column;
+    gap: 12px;
   }
 `;

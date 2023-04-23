@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
+import styled from 'styled-components';
 import { useAppSelector } from '@store/index';
+import { PRIMARY_COLOR, SECONDARY_COLOR, TRANS_GREEN } from '@constants/style';
+import TeamIntroduction from './TeamIntroduction';
+import PredictModal from '@articles/PredictModal';
+import NbaLatestGames from './NbaLatestGames';
 
 interface Props {
   isHome: boolean;
@@ -14,7 +18,8 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
   const awayDivideRate = (homeTotal + awayTotal) / awayTotal;
   const userInfo = useAppSelector((state) => state.user);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
-  const [value, setValue] = useState<string>('');
+  const latestGames = isHome ? data.lastGames_home : data.lastGames_away;
+  const introduction = isHome ? data.home : data.away;
 
   const onClickBetting = () => {
     if (!userInfo.address) {
@@ -24,107 +29,77 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
     setIsShowModal(true);
   };
 
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    const inputVal = event.target.value;
-    if (!/^[\d.]*$/.test(inputVal)) return;
-    if (inputVal.split('.').length > 2) return;
-    setValue(inputVal);
-  };
-
   return (
-    <div
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        border: '1px solid black',
-        justifyContent: 'center',
-      }}
-    >
-      <Image
-        src={data.team.logos[0].href}
-        alt="aa"
-        width={120}
-        height={120}
-        style={{ objectFit: 'contain', flex: 1 }}
-      />
-      <div>{data.team.displayName}</div>
-      <div>{data.record[0].summary}</div>
-      <section style={{ display: 'flex', border: '1px solid black', width: '100%' }}>
+    <Box>
+      <TeamIntroduction data={introduction} />
+      {!data.isStarted && <NbaLatestGames data={latestGames} />}
+      <BetWrapper>
         <div
           style={{
-            flex: 3,
+            flex: 1.5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            gap: '8px',
           }}
         >
-          <div>Total balance</div>
-          <div>{isHome ? homeTotal : awayTotal}</div>
+          <div className="bet-header">참여수량</div>
+          <div>{isHome ? homeTotal : awayTotal} Matic</div>
         </div>
         <div
           style={{
-            flex: 3,
+            flex: 1.5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            gap: '8px',
           }}
         >
-          <div>배당률</div>
+          <div className="bet-header">배당률</div>
           <div>{isHome ? homeDivideRate : awayDivideRate}</div>
         </div>
-        <button style={{ flex: 1 }} onClick={onClickBetting}>
+        <button
+          style={{
+            flex: 1,
+            fontSize: '18px',
+            boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.7)',
+            // border: `2px solid ${}`,
+            background: `${PRIMARY_COLOR}`,
+            color: 'white',
+            borderRadius: '4px',
+          }}
+          onClick={onClickBetting}
+        >
           참여하기
         </button>
-      </section>
-      {isShowModal && (
-        <div
-          style={{
-            border: '1px solid black',
-            width: '100vw',
-            height: '100%',
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            background: 'rgba(189, 190, 210, 0.25)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          onClick={() => {
-            setIsShowModal(false);
-            setValue('');
-          }}
-        >
-          <div
-            style={{
-              width: '330px',
-              height: '240px',
-              border: '2px solid red',
-              backgroundColor: 'white',
-              opacity: 1,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ flex: 3 }}>
-              <div>참여수량 입력</div>
-              <input type="text" value={value} onChange={handleChange} />
-              <button>max</button>
-              <button>half</button>
-            </div>
-            <div
-              style={{ display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'center' }}
-            >
-              <button onClick={onClickBetting}>예측하기</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </BetWrapper>
+      {isShowModal && <PredictModal setIsShowModal={setIsShowModal} />}
+    </Box>
   );
 };
 
 export default GamePrediction;
+
+const Box = styled('div')`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid ${PRIMARY_COLOR};
+  border-radius: 4px;
+  justify-content: center;
+  width: 100%;
+`;
+
+const BetWrapper = styled('section')`
+  display: flex;
+  border-top: 2px solid ${TRANS_GREEN};
+  width: 100%;
+  font-size: 20px;
+  padding: 6px;
+
+  & .bet-header {
+    font-size: 16px;
+    font-weight: 600;
+  }
+`;
