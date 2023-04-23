@@ -38,7 +38,7 @@ const Wrapper = styled('section')`
   display: flex;
   flex: 1;
   padding: 0 16px;
-  min-height: 200px;
+  min-height: 220px;
   flex-direction: column;
   width: 100%;
 `;

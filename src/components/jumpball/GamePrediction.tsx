@@ -73,7 +73,15 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
           참여하기
         </button>
       </BetWrapper>
-      {isShowModal && <PredictModal setIsShowModal={setIsShowModal} />}
+      {isShowModal && (
+        <PredictModal
+          setIsShowModal={setIsShowModal}
+          data={data}
+          isHome={isHome}
+          homeTotal={homeTotal}
+          awayTotal={awayTotal}
+        />
+      )}
     </Box>
   );
 };

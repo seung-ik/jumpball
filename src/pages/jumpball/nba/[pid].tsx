@@ -69,7 +69,7 @@ const NbaPage = () => {
           </div>
         </Info>
 
-        <div style={{ display: 'flex', gap: '3px', marginTop: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
           <GamePrediction isHome data={data} />
           <GamePrediction isHome={false} data={data} />
         </div>

@@ -7,7 +7,7 @@ interface Props {
 }
 
 const TeamIntroduction: React.FC<Props> = ({ data }) => {
-  const record = data.record[0].summary.split('-');
+  const record = data?.record[0].summary.split('-');
 
   return (
     <Wrapper>
@@ -22,7 +22,7 @@ const TeamIntroduction: React.FC<Props> = ({ data }) => {
       </Logo>
       <TextWrapper>
         <div>{data.team.displayName}</div>
-        <div className="record">{`(${record[0]}승 ${record[1]}패)`}</div>
+        <div className="record">{`${data.homeAway} | (${record[0]}승 ${record[1]}패)`}</div>
       </TextWrapper>
     </Wrapper>
   );
@@ -51,8 +51,9 @@ const TextWrapper = styled('div')`
   gap: 12px;
   justify-content: center;
 
-  $ .record {
+  & .record {
     font-size: 20px;
     font-weight: 600;
+    color: gray;
   }
 `;
