@@ -1,3 +1,4 @@
+import { TRANS_GREEN } from '@constants/style';
 import { DetailGameInfoType } from '@pages/jumpball/nba/[pid]';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -49,14 +50,14 @@ const NbaTable: React.FC<Props> = ({ data }) => {
             <tr>
               <td>{i > 3 ? '연장' : `${i + 1}Q`}</td>
               <td>{homeScore}</td>
-              <td>{homeAccScore}</td>
+              <td style={{ color: 'gray' }}>{homeAccScore}</td>
               <td>{awayScore}</td>
-              <td>{awayAccScore}</td>
+              <td style={{ color: 'gray' }}>{awayAccScore}</td>
             </tr>
           );
         })}
         <tr>
-          <td>total</td>
+          <td>Total</td>
           <td colSpan={2}>{data.home.score}</td>
           <td colSpan={2}>{data.away.score}</td>
         </tr>
@@ -68,13 +69,17 @@ const NbaTable: React.FC<Props> = ({ data }) => {
 export default NbaTable;
 
 const Table = styled('table')`
-  border: 1px solid black;
-
+  width: 100%;
+  margin-top: 32px;
+  font-size: 20px;
   & td {
-    border: 1px solid green;
+    border: 2px solid ${TRANS_GREEN};
+    padding: 6px;
   }
   & th {
-    border: 1px solid green;
+    border: 2px solid ${TRANS_GREEN};
+    padding: 8px;
+    font-weight: 600;
   }
   & tr {
     text-align: center;

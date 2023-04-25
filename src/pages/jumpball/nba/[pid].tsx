@@ -73,10 +73,8 @@ const NbaPage = () => {
           <GamePrediction isHome data={data} />
           <GamePrediction isHome={false} data={data} />
         </div>
-
         {data.isStarted && <NbaTable data={data} />}
         {data.isStarted && <NbaStatistics data={data} />}
-        {/* {!data.isStarted && <NbaLatestGames data={data} />} */}
       </Body>
     </Layout>
   );
