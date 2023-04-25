@@ -70,14 +70,15 @@ export default NbaTable;
 
 const Table = styled('table')`
   width: 100%;
-  margin-top: 32px;
+  margin-top: 24px;
   font-size: 20px;
+
   & td {
-    border: 2px solid ${TRANS_GREEN};
+    border: 1px solid ${TRANS_GREEN};
     padding: 6px;
   }
   & th {
-    border: 2px solid ${TRANS_GREEN};
+    border: 1px solid ${TRANS_GREEN};
     padding: 8px;
     font-weight: 600;
   }
