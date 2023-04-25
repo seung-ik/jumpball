@@ -2,6 +2,8 @@ import { TRANS_ORANGE, SECONDARY_COLOR, TRANS_GREEN } from '@constants/style';
 import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { getJumpBallContract, getSigner } from '@utils/wallet';
+import { ethers } from 'ethers';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,8 +39,26 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
     setValue(inputVal);
   };
 
-  const onClickBetting = () => {
-    alert('해야됨');
+  const onClickBetting = async () => {
+    const Contract = await getJumpBallContract();
+    const _date = new Date(data.date).getTime() / 1000;
+    const gameName = data.gameNote || 'Regular Season';
+
+    const result = await Contract.betting(
+      `${data.type}-${data.id}`,
+      _date,
+      gameName,
+      data.home.team.displayName,
+      data.away.team.displayName,
+      isHome,
+      {
+        value: ethers.parseEther('0.003'),
+        gasLimit: 300000,
+      },
+    );
+    console.log(result);
+    // Contract.getGameInfo('NBA-401541184').then(console.log);
+    // Contract.getMyBetInfo('NBA-401541184').then(console.log);
   };
 
   const onClickCloseModal = () => {

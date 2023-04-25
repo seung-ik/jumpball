@@ -1,5 +1,20 @@
 import networks, { Network } from "@/constants/networkInfo";
-import { ethers } from "ethers";
+import { Jumpball__factory } from '@constants/typechain-types';
+import { ethers } from 'ethers';
+
+export const getProvider = () => {
+  return new ethers.BrowserProvider(window.ethereum);
+};
+
+export const getSigner = () => {
+  return getProvider().getSigner();
+};
+
+export async function getJumpBallContract() {
+  //TODO: 네트워크id별로 관리필요
+  const signer = await getSigner();
+  return Jumpball__factory.connect('0x73D102a8004557986f63dD31143da58AA9de3b54', signer);
+}
 
 export const handleSwitchChain = async (_ethereum: any, _network: Network) => {
 	try {

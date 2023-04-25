@@ -13,7 +13,7 @@ interface Props {
 }
 
 const ConnectWalletModal: React.FC<Props> = ({ setIsShow }) => {
-  const [selectedNetwork, setSelectedNetwork] = useState<Network>(Network.polygon);
+  const [selectedNetwork, setSelectedNetwork] = useState<Network>(Network.mumbai);
   const dispatch = useAppDispatch();
   const onClickCloseModal = () => {
     document.body.style.overflow = 'visible';

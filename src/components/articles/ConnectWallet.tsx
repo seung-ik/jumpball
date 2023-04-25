@@ -24,15 +24,6 @@ const ConnectWallet = () => {
 };
 
 export default ConnectWallet;
-// const permission = await ethereum.request({
-//   method: 'wallet_requestPermissions',
-//   params: [
-//     {
-//       eth_accounts: {}
-//     }
-//   ]
-// })
-// console.log(permission, "permission")
 
 const WalletButton = styled('div')`
   position: fixed;
