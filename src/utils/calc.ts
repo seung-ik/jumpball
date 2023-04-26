@@ -6,7 +6,7 @@ export function calcDividedRate(_isHome: boolean, _homeTotal: number, _awayTotal
     calc = (_homeTotal + _awayTotal) / _awayTotal;
   }
 
-  return isNaN(calc) ? '참여자가 없습니다.' : calc.toFixed(2);
+  return isNaN(calc) ? '미정.' : calc.toFixed(2);
 }
 
 export function calcPredictDividedRate(

@@ -41,11 +41,11 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
       <BetWrapper>
         <Column>
           <div className="bet-header">참여수량</div>
-          <div>{isHome ? homeTotal : awayTotal} Matic</div>
+          <div className="bet-body">{isHome ? homeTotal : awayTotal} Matic</div>
         </Column>
         <Column>
           <div className="bet-header">배당률</div>
-          <div>{isHome ? homeDivideRate : awayDivideRate}</div>
+          <div className="bet-body">{isHome ? homeDivideRate : awayDivideRate}</div>
         </Column>
         {data.isStarted ? (
           <Button onClick={onClickBetting} color="gray">
@@ -90,7 +90,12 @@ const BetWrapper = styled('section')`
 
   & .bet-header {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
+  }
+
+  & .bet-body {
+    font-size: 16px;
+    font-weight: 400;
   }
 `;
 
