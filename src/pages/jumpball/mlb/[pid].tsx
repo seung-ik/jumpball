@@ -55,7 +55,7 @@ const MlbPage = () => {
         <Info>
           <div>
             <div className="info-title">{data?.gameNote || 'Regular Season'}</div>
-            <div>
+            <div className="info-text">
               경기시간 : {format(new Date(data.date), 'MM월dd일 hh:mm')} | 경기장: {data.location}
             </div>
           </div>
@@ -66,29 +66,19 @@ const MlbPage = () => {
                   <div className="info-title" style={{ marginBottom: '4px' }}>
                     {el.title}
                   </div>
-                  <div>{el.summary}</div>
+                  <div className="info-text">{el.summary}</div>
                 </div>
               );
             })}
           </div>
         </Info>
-
-        <div style={{ display: 'flex', gap: '3px', marginTop: '24px' }}>
-          <GamePrediction
-            isHome
-            data={data.home}
-            
-          />
-          <GamePrediction
-            isHome={false}
-            data={data.away}
-            
-          />
+        <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+          <GamePrediction isHome data={data} />
+          <GamePrediction isHome={false} data={data} />
         </div>
-
-        {isStarted && <NbaTable data={data} />}
-        {isStarted && <NbaStatistics data={data} />}
-        {/* {!isStarted && <NbaLatestGames data={data} />} */}
+        <div style={{ marginTop: '40px' }}>준비중...</div>
+        {/* {data.isStarted && <NbaTable data={data} />}
+        {data.isStarted && <NbaStatistics data={data} />} */}
       </Body>
     </Layout>
   );

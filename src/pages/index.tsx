@@ -12,13 +12,13 @@ export default function Home() {
           <div>nba/mlb 경기일정 확인 승부예측</div>
           <button onClick={() => router.push('/jumpball')}>JumpBall</button>
         </Box>
-        <Box grow={1}>
+        {/* <Box grow={1}>
           <div>세계 시간 변환기</div>
           <button onClick={() => router.push('/timeswap')}>TimeSwap</button>
-        </Box>
+        </Box> */}
       </div>
       <Header>Seed__Vault</Header>
-      <div style={{ display: 'flex', gap: '36px', flex: 1, maxHeight: '260px' }}>
+      {/* <div style={{ display: 'flex', gap: '36px', flex: 1, maxHeight: '260px' }}>
         <Box grow={2}>
           <div>nba/mlb 경기일정 확인 승부예측</div>
           <button style={{ backgroundColor: '#FFA500' }} onClick={() => router.push('/jumpball')}>
@@ -29,7 +29,7 @@ export default function Home() {
           <div>세계 시간 변환기</div>
           <button onClick={() => router.push('/timeswap')}>TimeSwap</button>
         </Box>
-      </div>
+      </div> */}
     </HomeLayout>
   );
 }
