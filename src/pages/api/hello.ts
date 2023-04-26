@@ -6,7 +6,7 @@ type Data = {
   data: any;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const uri = process.env.NEXT_PUBLIC_MONGO_DB_URI as string;
   const client = new MongoClient(uri);
   const db = client.db('betting');
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         .toArray();
       // const result = await db.collection("users").findOne({ name: "test" });
       client.close();
-      res.status(200).json({ data: result });
+      res.status(200).json(result);
     } else if (req.method === 'POST') {
       const { address, gameDate, gameId, home, away, pick, value, bettingHash } = req.body;
       const result = await db.collection(address).insertOne({

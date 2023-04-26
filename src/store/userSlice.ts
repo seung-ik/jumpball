@@ -1,9 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { ResponseMyBetting } from '@components/jumpball/MyTab';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-const initialState = {
+const initialState: {
+  address: string;
+  token: number;
+  chainId: number;
+  bettingList: ResponseMyBetting[];
+} = {
   address: '',
   token: 0,
   chainId: 1,
+  bettingList: [],
 };
 
 const userSlice = createSlice({
@@ -19,6 +27,20 @@ const userSlice = createSlice({
       Object.assign(state, initialState);
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchUserBettingList.fulfilled, (state, action) => {
+      state.bettingList = action.payload;
+    });
+  },
 });
 
 export default userSlice;
+
+export const fetchUserBettingList = createAsyncThunk(
+  'users/fetchUserBettingList',
+  async (_, thunkAPI: any): Promise<ResponseMyBetting[]> => {
+    const { address } = thunkAPI.getState().user;
+    const { data } = await axios.get('/api/hello', { params: { address } });
+    return data;
+  },
+);
