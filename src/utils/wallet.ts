@@ -44,6 +44,7 @@ export const getWalletInfo = async (_ethereum: any, _account?: string) => {
 	if (_account) {
 		const _balance = await provider.getBalance(_account);
 		const eth = ethers.formatEther(_balance);
+		localStorage.setItem('_account', _account);
 		return { address: _account, token: eth, chainId: parseInt(_chainId, 16) };
 	} else {
 		await _ethereum.request({
@@ -57,6 +58,7 @@ export const getWalletInfo = async (_ethereum: any, _account?: string) => {
 		const _accounts = await _ethereum.request({ method: "eth_requestAccounts" });
 		const _balance = await provider.getBalance(_accounts[0]);
 		const eth = ethers.formatEther(_balance);
+		localStorage.setItem('_account', _accounts[0]);
 		return { address: _accounts[0], token: eth, chainId: parseInt(_chainId, 16) };
 	}
 };

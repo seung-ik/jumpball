@@ -14,10 +14,7 @@ const ConnectedWallet = () => {
   //TODO: 메타마스크에서 이벤트도 받아서 처리해줘야함.
   const onClickDisconnect = () => {
     dispatch(userSlice.actions.reset());
-    // ethereum.send('wallet_requestPermissions', [{ eth_accounts: {} }])
-    // localStorage.removeItem('_user');
-    // localStorage.removeItem('_wallet');
-    // setTimeout(() => window.location.reload(), 1500);
+    localStorage.removeItem('_account');
   };
 
   useEffect(() => {

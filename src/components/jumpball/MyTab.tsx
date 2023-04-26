@@ -30,7 +30,6 @@ const MyTab = () => {
 
   return (
     <div>
-      <button>test</button>
       <Head>
         <span style={{ flex: 2.5, textAlign: 'center' }}>경기 날짜</span>
         <span style={{ flex: 3, textAlign: 'center' }}>경기 Id</span>
@@ -73,56 +72,6 @@ const MyTab = () => {
             </Row>
           );
         })}
-        {/* <Row>
-          <span style={{ flex: 1, textAlign: 'center' }}>23/04/24</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>NBA-401541243</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Boston Celtics</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Atlanta Hawks</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Home</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>0.2matic</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Home</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>
-            <button>수확</button>
-          </span>
-        </Row>
-        <Row>
-          <span style={{ flex: 1, textAlign: 'center' }}>23/04/24</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>NBA-401541243</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Boston Celtics</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Atlanta Hawks</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Home</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>0.2matic</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>
-            <button>검증하기</button>
-          </span>
-          <span style={{ flex: 1, textAlign: 'center' }}>
-            <button>미검증</button>
-          </span>
-        </Row>
-        <Row>
-          <span style={{ flex: 1, textAlign: 'center' }}>23/04/24</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>NBA-401541243</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Boston Celtics</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Atlanta Hawks</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Away</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>0.2matic</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Away</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>
-            <button>수확완료</button>
-          </span>
-        </Row>
-        <Row>
-          <span style={{ flex: 1, textAlign: 'center' }}>23/04/24</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>NBA-401541243</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Boston Celtics</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Atlanta Hawks</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Home</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>0.2matic</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>Away</span>
-          <span style={{ flex: 1, textAlign: 'center' }}>
-            <button>예측실패</button>
-          </span>
-        </Row> */}
       </Body>
     </div>
   );
