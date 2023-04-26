@@ -6,6 +6,8 @@ import GameTab from '@components/jumpball/GameTab';
 import TabButton from '@atoms/TabButton';
 import { fetchScoreBoardByDate } from '@utils/fetch';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { useAppDispatch, useAppSelector } from '@store/index';
+import dateSlice, { JumpBallTab } from '@store/pageSlice';
 
 export interface NBAEventType {
   id: string;
@@ -19,22 +21,20 @@ export interface NBAEventType {
   type: 'NBA' | 'MLB';
 }
 
-export type JumpBallTab = 'NBA' | 'MLB' | 'MY';
-
 const JumpBall = () => {
-  const [date, setDate] = useState<Date>(new Date());
-  const [tab, setTab] = useState<JumpBallTab>('NBA');
+  const { date, tab } = useAppSelector((state) => state.page);
+  const dispatch = useAppDispatch();
   const [gameList, setGameList] = useState<NBAEventType[]>([]);
 
   const handleDate = (_type: 'today' | 'add' | 'sub') => {
-    if (_type === 'today') setDate(new Date());
-    if (_type === 'add') setDate(addDays(date, 1));
-    if (_type === 'sub') setDate(subDays(date, 1));
+    if (_type === 'today') dispatch(dateSlice.actions.setDate(new Date()));
+    if (_type === 'add') dispatch(dateSlice.actions.addDate());
+    if (_type === 'sub') dispatch(dateSlice.actions.subDate());
   };
 
   const handleTab = (_value: JumpBallTab) => {
-    if (_value !== tab) setDate(new Date());
-    setTab(_value);
+    // if (_value !== tab) setDate(new Date());
+    dispatch(dateSlice.actions.setTab(_value));
   };
 
   useEffect(() => {
