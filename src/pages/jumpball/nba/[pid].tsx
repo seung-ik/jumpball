@@ -121,6 +121,7 @@ const Header = styled('button')`
 const Body = styled('div')`
   padding: 0 24px;
   margin-top: 50px;
+  margin-bottom: 80px;
 `;
 
 const Info = styled('div')`

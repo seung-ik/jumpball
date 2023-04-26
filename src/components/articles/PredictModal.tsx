@@ -6,6 +6,7 @@ import { getJumpBallContract, getSigner } from '@utils/wallet';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import { useAppSelector } from '@store/index';
+import { calcPredictDividedRate } from '@utils/calc';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,17 +22,8 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
   const selectedData = isHome ? data.home : data.away;
   const dividendRate = useMemo(() => {
     if (!value) return 0;
-    if (isHome) {
-      return (
-        ((homeTotal + awayTotal + Number(value)) * (Number(value) / (homeTotal + Number(value)))) /
-        Number(value)
-      );
-    } else {
-      return (
-        ((homeTotal + awayTotal + Number(value)) * (Number(value) / (awayTotal + Number(value)))) /
-        Number(value)
-      );
-    }
+
+    return calcPredictDividedRate(isHome, homeTotal, awayTotal, Number(value));
   }, [homeTotal, awayTotal, value, isHome]);
 
   const onChangeInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {

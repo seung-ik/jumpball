@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from '@store/index';
-import { PRIMARY_COLOR, SECONDARY_COLOR, TRANS_GREEN } from '@constants/style';
+import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
 import TeamIntroduction from './TeamIntroduction';
 import PredictModal from '@articles/PredictModal';
 import NbaLatestGames from './NbaLatestGames';
-import { getDividedRate } from '@utils/parser';
+import { calcDividedRate } from '@utils/calc';
 
 interface Props {
   isHome: boolean;
@@ -13,18 +13,22 @@ interface Props {
 }
 
 const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
-  const homeTotal = data.homeSum ? Number(data.homeSum.toFixed(3)) : 0;
-  const awayTotal = data.awaySum ? Number(data.awaySum.toFixed(3)) : 0;
-  const homeDivideRate = getDividedRate(true, homeTotal, awayTotal);
-  const awayDivideRate = getDividedRate(false, homeTotal, awayTotal);
   const userInfo = useAppSelector((state) => state.user);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
+
+  const homeTotal = data.homeSum ? Number(data.homeSum.toFixed(3)) : 0;
+  const awayTotal = data.awaySum ? Number(data.awaySum.toFixed(3)) : 0;
+  const homeDivideRate = calcDividedRate(true, homeTotal, awayTotal);
+  const awayDivideRate = calcDividedRate(false, homeTotal, awayTotal);
   const latestGames = isHome ? data.lastGames_home : data.lastGames_away;
   const introduction = isHome ? data.home : data.away;
 
   const onClickBetting = () => {
     if (!userInfo.address) {
       alert('지갑연결이후에 사용가능합니다.');
+      return;
+    } else if (data.isStarted) {
+      alert('참여가능한 기간이 아닙니다.');
       return;
     }
     setIsShowModal(true);
@@ -35,43 +39,21 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
       <TeamIntroduction data={introduction} />
       {!data.isStarted && <NbaLatestGames data={latestGames} />}
       <BetWrapper>
-        <div
-          style={{
-            flex: 1.5,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
+        <Column>
           <div className="bet-header">참여수량</div>
           <div>{isHome ? homeTotal : awayTotal} Matic</div>
-        </div>
-        <div
-          style={{
-            flex: 1.5,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
+        </Column>
+        <Column>
           <div className="bet-header">배당률</div>
           <div>{isHome ? homeDivideRate : awayDivideRate}</div>
-        </div>
-        <button
-          style={{
-            flex: 1,
-            fontSize: '18px',
-            boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.7)',
-            background: `${PRIMARY_COLOR}`,
-            color: 'white',
-            borderRadius: '4px',
-          }}
-          onClick={onClickBetting}
-        >
-          참여하기
-        </button>
+        </Column>
+        {data.isStarted ? (
+          <Button onClick={onClickBetting} color="gray">
+            완료
+          </Button>
+        ) : (
+          <Button onClick={onClickBetting}>참여하기</Button>
+        )}
       </BetWrapper>
       {isShowModal && (
         <PredictModal
@@ -110,4 +92,21 @@ const BetWrapper = styled('section')`
     font-size: 16px;
     font-weight: 600;
   }
+`;
+
+const Column = styled('div')`
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+`;
+
+const Button = styled('button')<{ color?: string }>`
+  flex: 1;
+  font-size: 18px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.7);
+  background: ${({ color }) => color || `${PRIMARY_COLOR}`};
+  color: white;
+  border-radius: 4px;
 `;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { addDays, subDays } from 'date-fns';
 import styled from 'styled-components';
 import MyTab from '@components/jumpball/MyTab';
 import GameTab from '@components/jumpball/GameTab';
@@ -23,6 +22,7 @@ export interface NBAEventType {
 
 const JumpBall = () => {
   const { date, tab } = useAppSelector((state) => state.page);
+  const { address } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const [gameList, setGameList] = useState<NBAEventType[]>([]);
 
@@ -33,8 +33,11 @@ const JumpBall = () => {
   };
 
   const handleTab = (_value: JumpBallTab) => {
-    // if (_value !== tab) setDate(new Date());
-    dispatch(dateSlice.actions.setTab(_value));
+    if (!address && _value === 'MY') {
+      alert('지갑연결후 사용할수 있습니다.');
+    } else {
+      dispatch(dateSlice.actions.setTab(_value));
+    }
   };
 
   useEffect(() => {

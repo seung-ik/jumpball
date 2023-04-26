@@ -76,7 +76,7 @@ const MlbPage = () => {
           <GamePrediction isHome data={data} />
           <GamePrediction isHome={false} data={data} />
         </div>
-        <div style={{ marginTop: '40px' }}>준비중...</div>
+        {data.isStarted && <div style={{ marginTop: '40px' }}>경기기록 준비중...</div>}
         {/* {data.isStarted && <NbaTable data={data} />}
         {data.isStarted && <NbaStatistics data={data} />} */}
       </Body>
@@ -114,6 +114,7 @@ const Header = styled('button')`
 const Body = styled('div')`
   padding: 0 24px;
   margin-top: 50px;
+  margin-bottom: 80px;
 `;
 
 const Info = styled('div')`
