@@ -20,3 +20,14 @@ export function parseChainId(_id: number): string | boolean {
 export const parseTimeToUsTime = (_date: Date) => {
   return new Date(_date.getTime() - 24 * 60 * 60 * 1000);
 };
+
+export function getDividedRate(_isHome: boolean, _homeTotal: number, _awayTotal: number) {
+  let calc;
+  if (_isHome) {
+    calc = (_homeTotal + _awayTotal) / _homeTotal;
+  } else {
+    calc = (_homeTotal + _awayTotal) / _awayTotal;
+  }
+
+  return isNaN(calc) ? '참여자가 없습니다.' : calc.toFixed(2);
+}

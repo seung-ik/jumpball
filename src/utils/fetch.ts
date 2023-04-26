@@ -67,6 +67,8 @@ export async function fetchNbaSummaryById(_id: string): Promise<DetailGameInfoTy
     date: gameDate,
     location: data.gameInfo.venue.fullName,
     series: data.header.competitions[0].series,
+    homeSum: 0,
+    awaySum: 0,
   };
 
   if (new Date(gameDate) >= new Date()) {
@@ -95,6 +97,8 @@ export async function fetchMlbSummaryById(_id: string): Promise<DetailGameInfoTy
     date: gameDate,
     location: data.gameInfo.venue.fullName,
     series: data.header.competitions[0].series,
+    homeSum: 0,
+    awaySum: 0,
   };
 
   if (new Date(gameDate) >= new Date()) {

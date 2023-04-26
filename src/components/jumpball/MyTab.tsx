@@ -1,7 +1,20 @@
-import React from 'react';
+import { useAppSelector } from '@store/index';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const MyTab = () => {
+  const { address } = useAppSelector((state) => state.user);
+  const [data, setData] = useState();
+
+  console.log(data);
+
+  useEffect(() => {
+    axios
+      .get('/api/hello', { params: { address } }) //
+      .then(({ data }) => setData(data));
+  }, [address]);
+
   return (
     <div>
       <Head>

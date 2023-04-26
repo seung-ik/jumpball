@@ -13,7 +13,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
       {data.boxscore_home.map((statistic: any, i: number) => {
         if (statistic.label === 'FG') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>
                 {data.boxscore_home[i]['displayValue']} ({data.boxscore_home[i + 1]['displayValue']}
                 %)
@@ -29,7 +29,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === '3PT') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>
                 {data.boxscore_home[i]['displayValue']} ({data.boxscore_home[i + 1]['displayValue']}
                 %)
@@ -61,7 +61,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Rebounds') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>리바운드</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -71,7 +71,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Offensive Rebounds') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>공격 리바운드</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -91,7 +91,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Assists') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>어시스트</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -101,7 +101,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Steals') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>스틸</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -121,7 +121,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Turnovers') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>턴오버</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -131,7 +131,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Points Off Turnovers') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>실책 기반 득점</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -141,7 +141,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Fouls') {
           return (
-            <Row>
+            <Row key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>파울</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>

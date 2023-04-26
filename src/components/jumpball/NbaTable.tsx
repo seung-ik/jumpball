@@ -47,7 +47,7 @@ const NbaTable: React.FC<Props> = ({ data }) => {
           }
 
           return (
-            <tr>
+            <tr key={_ + i}>
               <td>{i > 3 ? '연장' : `${i + 1}Q`}</td>
               <td>{homeScore}</td>
               <td style={{ color: 'gray' }}>{homeAccScore}</td>

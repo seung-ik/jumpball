@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { format } from 'date-fns';
 import { getJumpBallContract, getSigner } from '@utils/wallet';
 import { ethers } from 'ethers';
+import axios from 'axios';
+import { useAppSelector } from '@store/index';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,7 +17,7 @@ interface Props {
 
 const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal, awayTotal }) => {
   const [value, setValue] = useState<string>('');
-  console.log(data);
+  const userInfo = useAppSelector((state) => state.user);
   const selectedData = isHome ? data.home : data.away;
   const dividendRate = useMemo(() => {
     if (!value) return 0;
@@ -43,22 +45,40 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
     const Contract = await getJumpBallContract();
     const _date = new Date(data.date).getTime() / 1000;
     const gameName = data.gameNote || 'Regular Season';
+    const homeTeam = data.home.team.displayName;
+    const awayTeam = data.away.team.displayName;
+    const params = {
+      address: userInfo.address,
+      gameDate: new Date(data.date),
+      gameId: `${data.type}-${data.id}`,
+      home: homeTeam,
+      away: awayTeam,
+      pick: isHome,
+      value: value,
+      bettingHash: '',
+    };
 
-    const result = await Contract.betting(
-      `${data.type}-${data.id}`,
-      _date,
-      gameName,
-      data.home.team.displayName,
-      data.away.team.displayName,
-      isHome,
-      {
-        value: ethers.parseEther('0.003'),
-        gasLimit: 300000,
-      },
-    );
-    console.log(result);
-    // Contract.getGameInfo('NBA-401541184').then(console.log);
-    // Contract.getMyBetInfo('NBA-401541184').then(console.log);
+    try {
+      const tx: any = await Contract.betting(
+        `${data.type}-${data.id}`,
+        _date,
+        gameName,
+        homeTeam,
+        awayTeam,
+        isHome,
+        {
+          value: ethers.parseEther(value),
+          gasLimit: 300000,
+        },
+      );
+      const receipt = await tx.wait();
+      params['bettingHash'] = receipt.hash;
+      await axios.post('/api/hello', params);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      onClickCloseModal();
+    }
   };
 
   const onClickCloseModal = () => {
@@ -173,7 +193,7 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
               fontSize: '24px',
               borderRadius: '8px',
             }}
-            onClick={onClickBetting}
+            onClick={onClickCloseModal}
           >
             취소
           </button>

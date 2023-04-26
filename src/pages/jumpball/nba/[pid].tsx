@@ -8,6 +8,7 @@ import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import { IoIosArrowBack } from 'react-icons/io';
 import NbaTable from '@components/jumpball/NbaTable';
 import NbaStatistics from '@components/jumpball/NbaStatistics';
+import axios from 'axios';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -23,6 +24,8 @@ export interface DetailGameInfoType {
   date: any;
   location: string;
   series: any[];
+  homeSum: number;
+  awaySum: number;
 }
 
 const NbaPage = () => {
@@ -34,6 +37,14 @@ const NbaPage = () => {
     const getData = async (_id: string) => {
       const _data = await fetchNbaSummaryById(_id);
       setData(_data);
+      axios.get('/api/game', { params: { gameId: `NBA-${pid}` } }).then(({ data }) => {
+        const sumData = data.data;
+        if (sumData) {
+          setData((prev: any) => {
+            return { ...prev, homeSum: Number(sumData.homeSum), awaySum: Number(sumData.awaySum) };
+          });
+        }
+      });
     };
     if (pid) {
       getData(pid as string);
