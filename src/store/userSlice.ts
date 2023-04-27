@@ -41,6 +41,13 @@ export const fetchUserBettingList = createAsyncThunk(
   async (_, thunkAPI: any): Promise<ResponseMyBetting[]> => {
     const { address } = thunkAPI.getState().user;
     const { data } = await axios.get('/api/hello', { params: { address } });
-    return data;
+
+    const sortedByDate = data.sort((a: ResponseMyBetting, b: ResponseMyBetting) => {
+      if (new Date(a.gameDate) > new Date(b.gameDate)) return -1;
+      if (new Date(a.gameDate) < new Date(b.gameDate)) return 1;
+      return 0;
+    });
+
+    return sortedByDate;
   },
 );

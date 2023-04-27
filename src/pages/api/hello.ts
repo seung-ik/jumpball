@@ -32,6 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         pick,
         value,
         bettingHash,
+        isValidated: false,
+        winner: '',
+        canHarvestValue: 0,
+        isHarvested: false,
       });
 
       const savedGame = await db.collection('game').findOne({ gameId });
@@ -56,12 +60,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       client.close();
       res.status(200).json({ data: result });
     } else if (req.method === 'PUT') {
-      const { id, name, text } = req.body;
-      const result = await db
-        .collection('users')
-        .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { name, text } });
+      const { address, _id, isValidated, winner, canHarvestValue } = req.body;
+
+      const gameInfo = await db.collection(address).findOneAndUpdate(
+        { _id: new ObjectId(_id) },
+        {
+          $set: { isValidated, winner, canHarvestValue },
+        },
+      );
+      console.log(gameInfo, 'info');
+
       client.close();
-      res.status(200).json({ data: result });
+      res.status(200).json({ data: '123123' });
     }
   } catch (err) {
     console.error(err);

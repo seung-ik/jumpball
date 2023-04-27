@@ -4,6 +4,9 @@ import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '@store/index';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
 import { fetchUserBettingList } from '@store/userSlice';
+import { getJumpBallContract } from '@utils/wallet';
+import { ethers } from 'ethers';
+import axios from 'axios';
 
 export interface ResponseMyBetting {
   _id: string;
@@ -14,61 +17,106 @@ export interface ResponseMyBetting {
   away: string;
   home: string;
   pick: boolean;
+  isValidated?: boolean;
+  winner?: string;
+  canHarvestValue?: number;
+  isHarvested?: boolean;
 }
 
 const MyTab = () => {
   const { address, bettingList } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
+  function calcCanHarvestValue(
+    _winner: string,
+    _myPick: boolean,
+    _value: number,
+    _homeSum: number,
+    _awaySum: number,
+  ) {
+    if (_winner === 'HOME' && _myPick) {
+      return (_homeSum + _awaySum) * (_value / _homeSum);
+    } else if (_winner === 'AWAY' && !_myPick) {
+      return (_homeSum + _awaySum) * (_value / _awaySum);
+    } else {
+      return 0;
+    }
+  }
+
+  const onClickVerify = async (_id: string, _gameId: string, _myPick: boolean, _value: string) => {
+    const Contract = await getJumpBallContract();
+
+    const tx = await Contract.getGameInfo(_gameId);
+    const validator = tx[9];
+    const winner = Number(tx[8]) > 0 ? 'HOME' : 'AWAY';
+    const homeSum = ethers.formatEther(tx[6]);
+    const awaySum = ethers.formatEther(tx[7]);
+    const canHarvestValue = calcCanHarvestValue(
+      winner,
+      _myPick,
+      Number(_value),
+      Number(homeSum),
+      Number(awaySum),
+    );
+    const isValidated = parseInt(validator, 16) > 0 ? true : false;
+
+    if (!isValidated) {
+      alert('경기종료후 검증이 등록되지 않았습니다.(종료일 이후 자정등록)');
+    } else {
+      axios
+        .put('/api/hello', { isValidated, address, _id: _id, winner, canHarvestValue })
+        .then(console.log);
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchUserBettingList());
   }, [address]);
 
   if (bettingList.length === 0) {
-    return <div>참여 내역이 없습니다...</div>;
+    return <div>참여 내역이 없습니다.</div>;
   }
 
   return (
     <div>
       <Head>
-        <span style={{ flex: 2.5, textAlign: 'center' }}>경기 날짜</span>
-        <span style={{ flex: 3, textAlign: 'center' }}>경기 Id</span>
-        <span style={{ flex: 3.5, textAlign: 'center' }}>Home</span>
-        <span style={{ flex: 3.5, textAlign: 'center' }}>Away</span>
-        <span style={{ flex: 2, textAlign: 'center' }}>Pick</span>
-        <span style={{ flex: 2.5, textAlign: 'center' }}>수량(Matic)</span>
-        <span style={{ flex: 3, textAlign: 'center' }}>보상</span>
-        <span style={{ flex: 3, textAlign: 'center' }}>검증/수확</span>
+        <Span flex={2.5}>경기 날짜</Span>
+        <Span flex={3}>경기 Id</Span>
+        <Span flex={3.5}>Home</Span>
+        <Span flex={3.5}>Away</Span>
+        <Span flex={2}>Pick</Span>
+        <Span flex={2.5}>수량(Matic)</Span>
+        <Span flex={3}>승리/보상(Matic)</Span>
+        <Span flex={3}>검증/수확</Span>
       </Head>
       <Body>
         {bettingList.map((el) => {
           return (
             <Row>
-              <span style={{ flex: 2.5, textAlign: 'center' }}>
-                {format(new Date(el.gameDate), 'yy/MM/dd')}
-              </span>
-              <span style={{ flex: 3, textAlign: 'center' }}>{el.gameId}</span>
-              <span className="team-name" style={{ flex: 3.5, textAlign: 'center' }}>
+              <Span flex={2.5}>{format(new Date(el.gameDate), 'yy/MM/dd')}</Span>
+              <Span flex={3}>{el.gameId}</Span>
+              <Span className="team-name" flex={3.5}>
                 {el.home}
-              </span>
-              <span className="team-name" style={{ flex: 3.5, textAlign: 'center' }}>
+              </Span>
+              <Span className="team-name" flex={3.5}>
                 {el.away}
-              </span>
-              <span style={{ flex: 2, textAlign: 'center' }}>{el.pick ? 'Home' : 'Away'}</span>
-              <span style={{ flex: 2.5, textAlign: 'center' }}>{el.value}</span>
-              <span style={{ flex: 3, textAlign: 'center' }}>미검증</span>
-              <span style={{ flex: 3, textAlign: 'center' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <Button>검증</Button>
+              </Span>
+              <Span flex={2}>{el.pick ? 'Home' : 'Away'}</Span>
+              <Span flex={2.5}>{el.value}</Span>
+              <Span flex={3}>
+                {el.isValidated ? `${el.winner}/${el.canHarvestValue}` : '미검증'}
+              </Span>
+              <Span flex={3}>
+                <ButtonWrapper>
+                  <Button
+                    disabled={el.isValidated}
+                    onClick={() => onClickVerify(el._id, el.gameId, el.pick, el.value)}
+                  >
+                    검증
+                  </Button>
                   <Button>수확</Button>
-                </div>
-              </span>
+                </ButtonWrapper>
+              </Span>
             </Row>
           );
         })}
@@ -94,6 +142,11 @@ const Body = styled('div')`
   flex-direction: column;
 `;
 
+const Span = styled('span')<{ flex: number }>`
+  flex: ${({ flex }) => flex};
+  text-align: center;
+`;
+
 const Row = styled('div')`
   display: flex;
   align-items: center;
@@ -111,6 +164,12 @@ const Row = styled('div')`
   }
 `;
 
+const ButtonWrapper = styled('div')`
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+`;
+
 const Button = styled('button')`
   border: 1px solid black;
   padding: 8px;
@@ -120,5 +179,13 @@ const Button = styled('button')`
   &:hover {
     border: 1px solid ${PRIMARY_COLOR};
     color: ${PRIMARY_COLOR};
+  }
+
+  &:disabled {
+    border: 1.5px solid rgb(187, 190, 202);
+    color: rgb(187, 190, 202);
+    box-shadow: none;
+    background-color: rgb(234, 235, 239);
+    cursor: default;
   }
 `;
