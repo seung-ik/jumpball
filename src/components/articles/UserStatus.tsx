@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@store/index';
 import ConnectedWallet from './ConnectedWallet';
 import ConnectWallet from './ConnectWallet';
@@ -11,9 +11,9 @@ export const ethereum = window.ethereum;
 const UserStatus = () => {
   const userInfo = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const savedAccount = localStorage.getItem('_account');
 
-  useEffect(() => {
-    const savedAccount = localStorage.getItem('_account');
+  useLayoutEffect(() => {
     if (savedAccount) {
       getWalletInfo(ethereum, savedAccount) //
         .then(({ address, token, chainId }) => {
@@ -24,7 +24,7 @@ const UserStatus = () => {
 
   if (!window.ethereum) {
     return <InstallWallet />;
-  } else if (userInfo.address) {
+  } else if (userInfo.address || savedAccount) {
     return <ConnectedWallet />;
   } else {
     return <ConnectWallet />;

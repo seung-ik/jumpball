@@ -21,3 +21,7 @@ export const parseTimeToUsTime = (_date: Date) => {
   return new Date(_date.getTime() - 24 * 60 * 60 * 1000);
 };
 
+export const parseShortAddress = (_address: string) => {
+  return _address.slice(0, 5) + '...' + _address.slice(-5);
+};
+

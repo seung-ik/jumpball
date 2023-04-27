@@ -1,21 +1,44 @@
-import { useAppDispatch, useAppSelector } from '@store/index';
+import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import userSlice from '@store/userSlice';
-import { parseChainId } from '@utils/parser';
+import { useAppDispatch, useAppSelector } from '@store/index';
 import { getWalletInfo } from '@utils/wallet';
-import React, { useEffect, useState } from 'react';
+import { parseChainId, parseShortAddress } from '@utils/parser';
+import { CiWallet } from 'react-icons/ci';
+import { BiTimeFive } from 'react-icons/bi';
+import { AiOutlineCopy } from 'react-icons/ai';
+import { VscDebugDisconnect } from 'react-icons/vsc';
 import { RiArrowRightDownLine } from 'react-icons/ri';
 import { ethereum } from './UserStatus';
 
 const ConnectedWallet = () => {
-  const [isSmall, setIsSmall] = useState<boolean>(false);
+  const [isSmall, setIsSmall] = useState<boolean>(true);
+  const [isCopy, setIsCopy] = useState<boolean>(false);
   const userInfo = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  //TODO: 메타마스크에서 이벤트도 받아서 처리해줘야함.
+  const toggleSize = () => setIsSmall((prev) => !prev);
+
   const onClickDisconnect = () => {
     dispatch(userSlice.actions.reset());
     localStorage.removeItem('_account');
   };
+
+  const onClickCopy = async () => {
+    if (userInfo.address) {
+      setIsCopy(true);
+      navigator.clipboard
+        .writeText(userInfo.address) //
+        .then(() =>
+          setTimeout(() => {
+            setIsCopy(false);
+          }, 500),
+        );
+    }
+  };
+
+  const onClickOpenLink = () =>
+    window.open(`https://mumbai.polygonscan.com/address/${userInfo.address}`);
 
   useEffect(() => {
     const handleNetworkChanged = async (chainId: string) => {
@@ -43,56 +66,96 @@ const ConnectedWallet = () => {
   }, [dispatch]);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        border: '2px solid black',
-        background: '#3C3C3D',
-        borderRadius: '7px',
-        color: 'white',
-        padding: '8px 20px',
-      }}
-    >
+    <Wrapper>
       {isSmall ? (
-        <div style={{ cursor: 'pointer' }} onClick={() => setIsSmall((prev) => !prev)}>
-          Connected Info
-        </div>
+        <SmallBox onClick={toggleSize}>
+          <CiWallet size={28} />
+          <span className="text">{parseShortAddress(userInfo.address)}</span>
+        </SmallBox>
       ) : (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            position: 'relative',
-          }}
-        >
-          <div>{parseChainId(userInfo.chainId)}</div>
-          <div>Address: {userInfo.address}</div>
-          <div>Balance: {userInfo.token}</div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '-8px',
-              right: '-20px',
-              paddingLeft: '18px',
-              paddingTop: '8px',
-              cursor: 'pointer',
-            }}
-            onClick={() => setIsSmall((prev) => !prev)}
-          >
-            <RiArrowRightDownLine size={20} />
-          </div>
-          <div>
-            <button onClick={onClickDisconnect}>Disconnect</button>
-          </div>
-        </div>
+        <LargeBox>
+          <div>Network : {parseChainId(userInfo.chainId)}</div>
+          <IconText>
+            <span>Address : </span>
+            <span style={{ color: isCopy ? 'white' : 'black' }}>{userInfo.address}</span>
+            <AiOutlineCopy size={20} onClick={onClickCopy} />
+          </IconText>
+
+          <ButtonWrapper>
+            <IconText onClick={onClickDisconnect}>
+              <VscDebugDisconnect size={20} />
+              <span>Disconnect Wallet</span>
+            </IconText>
+            <i>|</i>
+            <IconText onClick={onClickOpenLink}>
+              <BiTimeFive size={20} />
+              <span>Recent Transactions</span>
+            </IconText>
+          </ButtonWrapper>
+
+          <ResizeButton onClick={toggleSize}>
+            <RiArrowRightDownLine size={28} color="black" />
+          </ResizeButton>
+        </LargeBox>
       )}
-    </div>
+    </Wrapper>
   );
 };
 
 export default ConnectedWallet;
+
+const Wrapper = styled('div')`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: 1.5px solid black;
+  background: rgba(252, 98, 56, 0.92);
+  border-radius: 7px;
+  padding: 8px 20px;
+`;
+
+const SmallBox = styled('div')`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  & .text {
+    margin-left: 8px;
+  }
+`;
+
+const LargeBox = styled('div')`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+`;
+
+const IconText = styled('div')`
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const ButtonWrapper = styled('div')`
+  display: flex;
+  align-items: center;
+  color: black;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 6px;
+
+  & i {
+    font-size: 20px;
+  }
+`;
+
+const ResizeButton = styled('div')`
+  position: absolute;
+  bottom: -10px;
+  right: -20px;
+  padding-left: 18px;
+  padding-top: 8px;
+  cursor: pointer;
+`;
