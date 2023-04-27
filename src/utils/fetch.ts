@@ -5,10 +5,10 @@ import { parseTimeToUsTime } from './parser';
 import { DetailGameInfoType } from '@pages/nba/[pid]';
 
 const NBA_SCOREBOARD_URL = (_date: string) => {
-  return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${_date}`;
+  return `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${_date}`;
 };
 const MLB_SCOREBOARD_URL = (_date: string) => {
-  return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${_date}`;
+  return `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${_date}`;
 };
 
 const MLB_SUMMARY_URL = (_id: string) => {
