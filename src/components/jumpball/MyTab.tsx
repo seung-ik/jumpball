@@ -60,15 +60,15 @@ const MyTab = () => {
     }
   };
 
-  if (bettingList.length === 0) {
-    return <div>참여 내역이 없습니다.</div>;
-  }
-
   useEffect(() => {
     if (!address) {
       dispatch(pageSlice.actions.setTab('NBA'));
     }
   }, [address]);
+
+  if (bettingList.length === 0) {
+    return <div>참여 내역이 없습니다.</div>;
+  }
 
   return (
     <div>
