@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { format } from 'date-fns';
-import { NBAEventType } from '@pages/jumpball';
+import { NBAEventType } from '@pages/index';
 import { parseTimeToUsTime } from './parser';
-import { DetailGameInfoType } from '@pages/jumpball/nba/[pid]';
+import { DetailGameInfoType } from '@pages/nba/[pid]';
 
 const NBA_SCOREBOARD_URL = (_date: string) => {
   return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${_date}`;

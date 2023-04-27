@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from '@store/index';
+import { useAppSelector, useAppDispatch } from '@store/index';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
-import { fetchUserBettingList } from '@store/userSlice';
 import { getJumpBallContract } from '@utils/wallet';
 import { ethers } from 'ethers';
 import axios from 'axios';
+import { calcCanHarvestValue } from '@utils/calc';
+import pageSlice from '@store/pageSlice';
 
 export interface ResponseMyBetting {
   _id: string;
@@ -27,21 +28,11 @@ const MyTab = () => {
   const { address, bettingList } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  function calcCanHarvestValue(
-    _winner: string,
-    _myPick: boolean,
-    _value: number,
-    _homeSum: number,
-    _awaySum: number,
-  ) {
-    if (_winner === 'HOME' && _myPick) {
-      return (_homeSum + _awaySum) * (_value / _homeSum);
-    } else if (_winner === 'AWAY' && !_myPick) {
-      return (_homeSum + _awaySum) * (_value / _awaySum);
-    } else {
-      return 0;
-    }
-  }
+  const onClickHarvest = async (_gameId: string) => {
+    const Contract = await getJumpBallContract();
+    const tx = await Contract.harvest(_gameId);
+    console.log(tx);
+  };
 
   const onClickVerify = async (_id: string, _gameId: string, _myPick: boolean, _value: string) => {
     const Contract = await getJumpBallContract();
@@ -69,13 +60,15 @@ const MyTab = () => {
     }
   };
 
-  useEffect(() => {
-    dispatch(fetchUserBettingList());
-  }, [address]);
-
   if (bettingList.length === 0) {
     return <div>참여 내역이 없습니다.</div>;
   }
+
+  useEffect(() => {
+    if (!address) {
+      dispatch(pageSlice.actions.setTab('NBA'));
+    }
+  }, [address]);
 
   return (
     <div>
@@ -92,7 +85,7 @@ const MyTab = () => {
       <Body>
         {bettingList.map((el) => {
           return (
-            <Row>
+            <Row key={el._id}>
               <Span flex={2.5}>{format(new Date(el.gameDate), 'yy/MM/dd')}</Span>
               <Span flex={3}>{el.gameId}</Span>
               <Span className="team-name" flex={3.5}>
@@ -101,7 +94,7 @@ const MyTab = () => {
               <Span className="team-name" flex={3.5}>
                 {el.away}
               </Span>
-              <Span flex={2}>{el.pick ? 'Home' : 'Away'}</Span>
+              <Span flex={2}>{el.pick ? 'HOME' : 'AWAY'}</Span>
               <Span flex={2.5}>{el.value}</Span>
               <Span flex={3}>
                 {el.isValidated ? `${el.winner}/${el.canHarvestValue}` : '미검증'}
@@ -114,7 +107,7 @@ const MyTab = () => {
                   >
                     검증
                   </Button>
-                  <Button>수확</Button>
+                  <Button onClick={() => onClickHarvest(el.gameId)}>수확</Button>
                 </ButtonWrapper>
               </Span>
             </Row>

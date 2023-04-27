@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { DetailGameInfoType } from '@pages/jumpball/nba/[pid]';
+import { DetailGameInfoType } from '@pages/nba/[pid]';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
@@ -22,7 +22,7 @@ const NbaLatestGames: React.FC<Props> = ({ data }) => {
             <div className="date">{date}</div>
             <div className="result">{el.gameResult}</div>
             <div className="score">{el.score}</div>
-            <div className="versus" onClick={() => router.push(`/jumpball/nba/${el.id}`)}>
+            <div className="versus" onClick={() => router.push(`/nba/${el.id}`)}>
               {el.opponent.displayName}
             </div>
           </GameWrapper>

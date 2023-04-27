@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { NBAEventType } from '@pages/jumpball';
+import { NBAEventType } from '@pages/index';
 import ScoreBoard from './ScoreBoard';
 import { TRANS_GREEN, SECONDARY_COLOR, PRIMARY_COLOR } from '@constants/style';
 import { BsBoxArrowInRight } from 'react-icons/bs';
@@ -24,8 +24,8 @@ const GameItem: React.FC<NBAEventType> = ({
   const onClickBoxToggle = () => setActive((prev) => !prev);
   const onClickDetailPage: React.MouseEventHandler<HTMLElement> = (e) => {
     e.stopPropagation();
-    if (type === 'MLB') router.push(`/jumpball/mlb/${id}`);
-    if (type === 'NBA') router.push(`/jumpball/nba/${id}`);
+    if (type === 'MLB') router.push(`/mlb/${id}`);
+    if (type === 'NBA') router.push(`/nba/${id}`);
   };
 
   useEffect(() => {

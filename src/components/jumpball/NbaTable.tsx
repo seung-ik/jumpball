@@ -1,5 +1,5 @@
 import { TRANS_GREEN } from '@constants/style';
-import { DetailGameInfoType } from '@pages/jumpball/nba/[pid]';
+import { DetailGameInfoType } from '@pages/nba/[pid]';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 

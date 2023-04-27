@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import styled from 'styled-components';
-import { NBAEventType } from '@pages/jumpball';
+import { NBAEventType } from '@pages/index';
 import NoGames from '@components/jumpball/NoGames';
 import GameItem from '@components/jumpball/GameItem';
 import { PRIMARY_COLOR } from '@constants/style';

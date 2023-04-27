@@ -29,3 +29,19 @@ export function calcPredictDividedRate(
     );
   }
 }
+
+export function calcCanHarvestValue(
+  _winner: string,
+  _myPick: boolean,
+  _value: number,
+  _homeSum: number,
+  _awaySum: number,
+) {
+  if (_winner === 'HOME' && _myPick) {
+    return (_homeSum + _awaySum) * (_value / _homeSum);
+  } else if (_winner === 'AWAY' && !_myPick) {
+    return (_homeSum + _awaySum) * (_value / _awaySum);
+  } else {
+    return 0;
+  }
+}

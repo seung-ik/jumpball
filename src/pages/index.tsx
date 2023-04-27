@@ -1,55 +1,119 @@
-import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import HomeLayout from '@layout/HomeLayout';
+import MyTab from '@components/jumpball/MyTab';
+import GameTab from '@components/jumpball/GameTab';
+import TabButton from '@atoms/TabButton';
+import { fetchScoreBoardByDate } from '@utils/fetch';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { useAppDispatch, useAppSelector } from '@store/index';
+import pageSlice, { JumpBallTab } from '@store/pageSlice';
+import { fetchUserBettingList } from '@store/userSlice';
 
-export default function Home() {
-  const router = useRouter();
-
-  return (
-    <HomeLayout>
-      <div style={{ display: 'flex', gap: '36px', flex: 1, maxHeight: '260px' }}>
-        <Box grow={3}>
-          <div>nba/mlb 경기일정 확인 승부예측</div>
-          <button onClick={() => router.push('/jumpball')}>JumpBall</button>
-        </Box>
-        {/* <Box grow={1}>
-          <div>세계 시간 변환기</div>
-          <button onClick={() => router.push('/timeswap')}>TimeSwap</button>
-        </Box> */}
-      </div>
-      <Header>Seed__Vault</Header>
-      {/* <div style={{ display: 'flex', gap: '36px', flex: 1, maxHeight: '260px' }}>
-        <Box grow={2}>
-          <div>nba/mlb 경기일정 확인 승부예측</div>
-          <button style={{ backgroundColor: '#FFA500' }} onClick={() => router.push('/jumpball')}>
-            JumpBall
-          </button>
-        </Box>
-        <Box grow={2}>
-          <div>세계 시간 변환기</div>
-          <button onClick={() => router.push('/timeswap')}>TimeSwap</button>
-        </Box>
-      </div> */}
-    </HomeLayout>
-  );
+export interface NBAEventType {
+  id: string;
+  completed: boolean;
+  name: string;
+  shortName: string;
+  homeTeam: any;
+  awayTeam: any;
+  location: string;
+  date: string;
+  type: 'NBA' | 'MLB';
 }
 
-const Header = styled('div')`
-  height: 70px;
+const JumpBall = () => {
+  const { date, tab } = useAppSelector((state) => state.page);
+  const { address } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const [gameList, setGameList] = useState<NBAEventType[]>([]);
+
+  const handleDate = (_type: 'today' | 'add' | 'sub') => {
+    if (_type === 'today') dispatch(pageSlice.actions.setDate(new Date()));
+    if (_type === 'add') dispatch(pageSlice.actions.addDate());
+    if (_type === 'sub') dispatch(pageSlice.actions.subDate());
+  };
+
+  const handleTab = (_value: JumpBallTab) => {
+    if (!address && _value === 'MY') {
+      alert('지갑연결후 사용할수 있습니다.');
+    } else {
+      dispatch(pageSlice.actions.setTab(_value));
+    }
+  };
+
+  useEffect(() => {
+    const getGameList = async () => {
+      if (tab !== 'MY') {
+        const gameList = await fetchScoreBoardByDate(date, tab);
+        setGameList(gameList);
+      } else {
+        setGameList([]);
+      }
+    };
+    getGameList();
+  }, [date, tab]);
+
+  useEffect(() => {
+    if (address) {
+      dispatch(fetchUserBettingList());
+    }
+  }, [address]);
+
+  return (
+    <Layout>
+      <Header>
+        <TabButton tab={tab} handleTab={handleTab} name="NBA" value="NBA" />
+        <TabButton tab={tab} handleTab={handleTab} name="MLB" value="MLB" />
+        <TabButton tab={tab} handleTab={handleTab} name="나의 예측" value="MY" />
+      </Header>
+      <Body>
+        {tab === 'MY' ? (
+          <MyTab />
+        ) : (
+          <GameTab gameList={gameList} date={date} handleDate={handleDate} />
+        )}
+      </Body>
+    </Layout>
+  );
+};
+
+export default JumpBall;
+
+const Layout = styled('div')`
+  border-left: 1px solid ${TRANS_GREEN};
+  border-right: 1px solid ${TRANS_GREEN};
+  max-width: ${MAX_WIDTH}px;
   display: flex;
-  align-items: center;
-  font-size: 28px;
-  padding-left: 6%;
-  border-top: 2px solid black;
-  border-bottom: 2px solid black;
-  margin: 12px 0;
-  margin-left: 12px;
-  user-select: none;
+  flex-direction: column;
+  margin: auto;
+  min-height: 100vh;
+  padding: 0 4px;
 `;
-const Box = styled('div')<{ grow?: number }>`
-  border: 2px solid #2d984a;
-  flex: ${({ grow }) => grow || 1};
-  height: 100%;
-  border-radius: 36px;
-  padding: 16px;
+
+const Header = styled('header')`
+  display: flex;
+  justify-content: space-between;
+  height: 72px;
+  gap: 4px;
+
+  & > button {
+    flex: 1;
+    border-bottom: 4px solid ${TRANS_GREEN};
+    font-size: 24px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  & > button.active {
+    border-bottom: 4px solid ${PRIMARY_COLOR};
+    color: ${PRIMARY_COLOR};
+  }
+`;
+
+const Body = styled('section')`
+  margin-top: 80px;
+  margin-bottom: 140px;
+  padding: 0 24px;
 `;

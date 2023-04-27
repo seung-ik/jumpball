@@ -13,7 +13,7 @@ const initialState: PageSliceType = {
   tab: 'NBA',
 };
 
-const userSlice = createSlice({
+const pageSlice = createSlice({
   name: 'date',
   initialState,
   reducers: {
@@ -35,4 +35,4 @@ const userSlice = createSlice({
   },
 });
 
-export default userSlice;
+export default pageSlice;

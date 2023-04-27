@@ -1,5 +1,5 @@
+import { JumpBallTab } from '@store/pageSlice';
 import React from 'react';
-import { JumpBallTab } from '@pages/jumpball';
 import { BiBaseball, BiBasketball } from 'react-icons/bi';
 import { TfiWrite } from 'react-icons/tfi';
 

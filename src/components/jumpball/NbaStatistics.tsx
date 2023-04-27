@@ -1,5 +1,5 @@
 import React from 'react';
-import { DetailGameInfoType } from '@pages/jumpball/nba/[pid]';
+import { DetailGameInfoType } from '@pages/nba/[pid]';
 import { TRANS_GREEN } from '@constants/style';
 import styled from 'styled-components';
 
