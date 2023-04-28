@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { useAppSelector } from '@store/index';
@@ -17,12 +17,18 @@ interface Props {
 const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
   const userInfo = useAppSelector((state) => state.user);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
-  const { data: betInfo } = useQuery(['detail_bet_info_key', data.type, data.id], getBetInfo);
+  const { data: betInfo } = useQuery(['bet_info_key', data.type, data.id], getBetInfo);
 
   const homeTotal = betInfo?.homeSum ? Number(Number(betInfo?.homeSum).toFixed(3)) : 0;
   const awayTotal = betInfo?.awaySum ? Number(Number(betInfo?.awaySum).toFixed(3)) : 0;
-  const homeDivideRate = calcDividedRate(true, homeTotal, awayTotal);
-  const awayDivideRate = calcDividedRate(false, homeTotal, awayTotal);
+  const homeDivideRate = useMemo(
+    () => calcDividedRate(true, homeTotal, awayTotal),
+    [homeTotal, awayTotal],
+  );
+  const awayDivideRate = useMemo(
+    () => calcDividedRate(false, homeTotal, awayTotal),
+    [homeTotal, awayTotal],
+  );
   const latestGames = isHome ? data.lastGames_home : data.lastGames_away;
   const introduction = isHome ? data.home : data.away;
 

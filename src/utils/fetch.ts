@@ -122,6 +122,7 @@ export async function getBetInfo(config: QueryFunctionContext<any[], any>) {
 export async function getDetailGameInfo(config: QueryFunctionContext<any[], any>) {
   const type = config.queryKey[1];
   const id = config.queryKey[2] as string;
+  if (!id) return;
   let data;
   if (type === 'NBA') {
     data = await fetchNbaSummaryById(id);
@@ -145,7 +146,7 @@ export function postBettingSuccessCallback(
   _isHome: boolean,
   _value: string,
 ) {
-  _queryClient.setQueryData(['detail_bet_info_key', _data.type, _data.id], (prev: any) => {
+  _queryClient.setQueryData(['bet_info_key', _data.type, _data.id], (prev: any) => {
     if (!prev && _isHome) {
       return { homeSum: Number(_value), awaySum: 0 };
     } else if (!prev && !_isHome) {
