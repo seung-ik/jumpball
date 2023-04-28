@@ -10,7 +10,14 @@ const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 300000,
+        cacheTime: 300000,
+      },
+    },
+  });
 
   return (
     <Provider store={store}>

@@ -6,7 +6,7 @@ type Data = {
   data: any;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const uri = process.env.NEXT_PUBLIC_MONGO_DB_URI as string;
   const client = new MongoClient(uri);
   const db = client.db('betting');
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       const { gameId } = req.query;
       const result = await db.collection('game').findOne({ gameId });
       client.close();
-      res.status(200).json({ data: result });
+      res.status(200).json(result);
     } catch (err) {
       console.error(err);
     }

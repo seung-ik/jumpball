@@ -20,7 +20,7 @@ export interface ResponseMyBetting {
   pick: boolean;
   isValidated?: boolean;
   winner?: string;
-  canHarvestValue?: number;
+  harvestValue?: number;
   isHarvested?: boolean;
 }
 
@@ -34,10 +34,8 @@ const MyTab = () => {
       const Contract = await getJumpBallContract();
       const tx = await Contract.harvest(_gameId);
       const receipt = await tx.wait();
-      console.log(receipt, 'receipt');
-      axios
-        .put('/api/harvest', { address, _id: _id, harvestValue: 0, harvestHash: receipt.hash })
-        .then(console.log);
+      // console.log(receipt, 'receipt');
+      axios.put('/api/harvest', { address, _id: _id, harvestValue: 0, harvestHash: receipt.hash });
     } catch (err) {
       console.error(err);
       alert(err);
@@ -52,7 +50,7 @@ const MyTab = () => {
     const winner = Number(tx[8]) > 0 ? 'HOME' : 'AWAY';
     const homeSum = ethers.formatEther(tx[6]);
     const awaySum = ethers.formatEther(tx[7]);
-    const canHarvestValue = calcCanHarvestValue(
+    const harvestValue = calcCanHarvestValue(
       winner,
       _myPick,
       Number(_value),
@@ -64,9 +62,7 @@ const MyTab = () => {
     if (!isValidated) {
       alert('경기종료후 검증이 등록되지 않았습니다.(종료일 이후 자정등록)');
     } else {
-      axios
-        .put('/api/hello', { isValidated, address, _id: _id, winner, canHarvestValue })
-        .then(console.log);
+      axios.put('/api/hello', { isValidated, address, _id: _id, winner, harvestValue });
     }
   };
 
@@ -83,10 +79,10 @@ const MyTab = () => {
   return (
     <div>
       <Head>
-        <Span flex={2.5}>경기 날짜</Span>
-        <Span flex={3}>경기 Id</Span>
-        <Span flex={3.5}>Home</Span>
-        <Span flex={3.5}>Away</Span>
+        <Span flex={2.4}>경기 날짜</Span>
+        <Span flex={3.2}>경기 Id</Span>
+        <Span flex={3.4}>Home</Span>
+        <Span flex={3.4}>Away</Span>
         <Span flex={2}>Pick</Span>
         <Span flex={2.5}>수량(Matic)</Span>
         <Span flex={3}>승리/보상(Matic)</Span>
@@ -96,18 +92,18 @@ const MyTab = () => {
         {bettingList.map((el) => {
           return (
             <Row key={el._id}>
-              <Span flex={2.5}>{format(new Date(el.gameDate), 'yy/MM/dd')}</Span>
-              <Span flex={3}>{el.gameId}</Span>
-              <Span className="team-name" flex={3.5}>
+              <Span flex={2.4}>{format(new Date(el.gameDate), 'yy/MM/dd')}</Span>
+              <Span flex={3.2}>{el.gameId}</Span>
+              <Span className="team-name" flex={3.4}>
                 {el.home}
               </Span>
-              <Span className="team-name" flex={3.5}>
+              <Span className="team-name" flex={3.4}>
                 {el.away}
               </Span>
               <Span flex={2}>{el.pick ? 'HOME' : 'AWAY'}</Span>
               <Span flex={2.5}>{el.value}</Span>
               <Span flex={3}>
-                {el.isValidated ? `${el.winner}/${el.canHarvestValue?.toFixed(3)}` : '미검증'}
+                {el.isValidated ? `${el.winner}/${el.harvestValue?.toFixed(3)}` : '미검증'}
               </Span>
               <Span flex={3}>
                 <ButtonWrapper>

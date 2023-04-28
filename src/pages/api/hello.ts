@@ -11,20 +11,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   const client = new MongoClient(uri);
   const db = client.db('betting');
 
-  try {
-    await client.connect();
-    if (req.method === 'GET') {
-      const { address } = req.query;
-      const result = await db
-        .collection(address as string)
-        .find()
-        .toArray();
-      // const result = await db.collection("users").findOne({ name: "test" });
-      client.close();
-      res.status(200).json(result);
-    } else if (req.method === 'POST') {
+  await client.connect();
+  if (req.method === 'GET') {
+    const { address } = req.query;
+    const result = await db
+      .collection(address as string)
+      .find()
+      .toArray();
+    // const result = await db.collection("users").findOne({ name: "test" });
+    client.close();
+    res.status(200).json(result);
+  } else if (req.method === 'POST') {
+    try {
       const { address, gameDate, gameId, home, away, pick, value, bettingHash } = req.body;
-      const result = await db.collection(address).insertOne({
+
+      await db.collection(address).insertOne({
         gameDate,
         gameId,
         home,
@@ -58,23 +59,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
           .collection('game')
           .findOneAndUpdate({ gameId }, { $set: { homeSum: newHomeSum, awaySum: newAwaySum } });
       }
-      client.close();
-      res.status(200).json({ data: result });
-    } else if (req.method === 'PUT') {
-      const { address, _id, isValidated, winner, harvestValue } = req.body;
-
-      await db.collection(address).findOneAndUpdate(
-        { _id: new ObjectId(_id) },
-        {
-          $set: { isValidated, winner, harvestValue },
-        },
-      );
-
-      client.close();
-      res.status(200).json({ data: '123123' });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ data: 'fail' });
     }
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ data: 'ooj' });
+
+    client.close();
+    res.status(200).json({ data: 'success' });
+  } else if (req.method === 'PUT') {
+    const { address, _id, isValidated, winner, harvestValue } = req.body;
+
+    await db.collection(address).findOneAndUpdate(
+      { _id: new ObjectId(_id) },
+      {
+        $set: { isValidated, winner, harvestValue },
+      },
+    );
+
+    client.close();
+    res.status(200).json({ data: '123123' });
   }
 }

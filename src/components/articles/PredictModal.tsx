@@ -8,6 +8,8 @@ import { getJumpBallContract } from '@utils/wallet';
 import { calcPredictDividedRate } from '@utils/calc';
 import { TRANS_ORANGE, SECONDARY_COLOR, TRANS_GREEN, PRIMARY_COLOR } from '@constants/style';
 import InfoText from '@atoms/InfoText';
+import { useMutation, useQueryClient } from 'react-query';
+import { postBettingSuccessCallback } from '@utils/fetch';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,6 +22,14 @@ interface Props {
 const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal, awayTotal }) => {
   const userInfo = useAppSelector((state) => state.user);
   const [value, setValue] = useState<string>('');
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation(postBetting, {
+    onSuccess: () => postBettingSuccessCallback(queryClient, data, isHome, value),
+  });
+
+  async function postBetting(_params: any) {
+    return await axios.post('/api/hello', _params);
+  }
 
   const selectedData = isHome ? data.home : data.away;
 
@@ -43,17 +53,6 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
     const awayTeam = data.away.team.displayName;
 
     try {
-      const params = {
-        address: userInfo.address,
-        gameDate: new Date(data.date),
-        gameId: `${data.type}-${data.id}`,
-        home: homeTeam,
-        away: awayTeam,
-        pick: isHome,
-        value: value,
-        bettingHash: '',
-      };
-
       const tx: any = await Contract.betting(
         `${data.type}-${data.id}`,
         _date,
@@ -66,10 +65,19 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
           gasLimit: 300000,
         },
       );
-
       const receipt = await tx.wait();
-      params['bettingHash'] = receipt.hash;
-      await axios.post('/api/hello', params);
+
+      const params = {
+        address: userInfo.address,
+        gameDate: new Date(data.date),
+        gameId: `${data.type}-${data.id}`,
+        home: homeTeam,
+        away: awayTeam,
+        pick: isHome,
+        value: value,
+        bettingHash: receipt.hash,
+      };
+      mutate(params);
     } catch (err) {
       console.error(err);
     } finally {

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { useAppSelector } from '@store/index';
+import { getBetInfo } from '@utils/fetch';
+import { calcDividedRate } from '@utils/calc';
+import PredictModal from '@articles/PredictModal';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
 import TeamIntroduction from './TeamIntroduction';
-import PredictModal from '@articles/PredictModal';
 import NbaLatestGames from './NbaLatestGames';
-import { calcDividedRate } from '@utils/calc';
 
 interface Props {
   isHome: boolean;
@@ -15,9 +17,10 @@ interface Props {
 const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
   const userInfo = useAppSelector((state) => state.user);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
+  const { data: betInfo } = useQuery(['detail_bet_info_key', data.type, data.id], getBetInfo);
 
-  const homeTotal = data.homeSum ? Number(data.homeSum.toFixed(3)) : 0;
-  const awayTotal = data.awaySum ? Number(data.awaySum.toFixed(3)) : 0;
+  const homeTotal = betInfo?.homeSum ? Number(Number(betInfo?.homeSum).toFixed(3)) : 0;
+  const awayTotal = betInfo?.awaySum ? Number(Number(betInfo?.awaySum).toFixed(3)) : 0;
   const homeDivideRate = calcDividedRate(true, homeTotal, awayTotal);
   const awayDivideRate = calcDividedRate(false, homeTotal, awayTotal);
   const latestGames = isHome ? data.lastGames_home : data.lastGames_away;

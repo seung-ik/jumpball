@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { NBAEventType } from '@pages/index';
 import { parseTimeToUsTime } from './parser';
 import { DetailGameInfoType } from '@pages/nba/[pid]';
-import { QueryFunctionContext } from 'react-query';
+import { QueryFunctionContext, QueryClient } from 'react-query';
 
 const NBA_SCOREBOARD_URL = (_date: string) => {
   return `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${_date}`;
@@ -137,4 +137,23 @@ export async function getGameList(config: QueryFunctionContext<any[], any>) {
   const _tab = config.queryKey[2] as 'NBA' | 'MLB';
   const gameList = await fetchScoreBoardByDate(_date, _tab);
   return gameList;
+}
+
+export function postBettingSuccessCallback(
+  _queryClient: QueryClient,
+  _data: any,
+  _isHome: boolean,
+  _value: string,
+) {
+  _queryClient.setQueryData(['detail_bet_info_key', _data.type, _data.id], (prev: any) => {
+    if (!prev && _isHome) {
+      return { homeSum: Number(_value), awaySum: 0 };
+    } else if (!prev && !_isHome) {
+      return { awaySum: Number(_value), homeSum: 0 };
+    } else if (prev && _isHome) {
+      return { ...prev, homeSum: Number(prev.homeSum) + Number(_value) };
+    } else {
+      return { ...prev, awaySum: Number(prev.awaySum) + Number(_value) };
+    }
+  });
 }
