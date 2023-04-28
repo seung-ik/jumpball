@@ -27,11 +27,21 @@ export interface ResponseMyBetting {
 const MyTab = () => {
   const { address, bettingList } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  console.log(bettingList);
 
-  const onClickHarvest = async (_gameId: string) => {
-    const Contract = await getJumpBallContract();
-    const tx = await Contract.harvest(_gameId);
-    console.log(tx);
+  const onClickHarvest = async (_id: string, _gameId: string) => {
+    try {
+      const Contract = await getJumpBallContract();
+      const tx = await Contract.harvest(_gameId);
+      const receipt = await tx.wait();
+      console.log(receipt, 'receipt');
+      axios
+        .put('/api/harvest', { address, _id: _id, harvestValue: 0, harvestHash: receipt.hash })
+        .then(console.log);
+    } catch (err) {
+      console.error(err);
+      alert(err);
+    }
   };
 
   const onClickVerify = async (_id: string, _gameId: string, _myPick: boolean, _value: string) => {
@@ -97,7 +107,7 @@ const MyTab = () => {
               <Span flex={2}>{el.pick ? 'HOME' : 'AWAY'}</Span>
               <Span flex={2.5}>{el.value}</Span>
               <Span flex={3}>
-                {el.isValidated ? `${el.winner}/${el.canHarvestValue}` : '미검증'}
+                {el.isValidated ? `${el.winner}/${el.canHarvestValue?.toFixed(3)}` : '미검증'}
               </Span>
               <Span flex={3}>
                 <ButtonWrapper>
@@ -107,7 +117,7 @@ const MyTab = () => {
                   >
                     검증
                   </Button>
-                  <Button onClick={() => onClickHarvest(el.gameId)}>수확</Button>
+                  <Button onClick={() => onClickHarvest(el._id, el.gameId)}>수확</Button>
                 </ButtonWrapper>
               </Span>
             </Row>

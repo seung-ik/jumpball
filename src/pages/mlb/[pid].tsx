@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fetchMlbSummaryById } from '@utils/fetch';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import { IoIosArrowBack } from 'react-icons/io';
+import axios from 'axios';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -27,15 +28,20 @@ const MlbPage = () => {
   const router = useRouter();
   const { pid } = router.query;
   const [data, setData] = useState<DetailGameInfoType>();
-  const isStarted = useMemo(() => {
-    if (!data) return false;
-    return data.boxscore_home.length > 0;
-  }, [data]);
 
   useEffect(() => {
     const getData = async (_id: string) => {
       const _data = await fetchMlbSummaryById(_id);
       setData(_data);
+
+      axios.get('/api/game', { params: { gameId: `MLB-${pid}` } }).then(({ data }) => {
+        const sumData = data.data;
+        if (sumData) {
+          setData((prev: any) => {
+            return { ...prev, homeSum: Number(sumData.homeSum), awaySum: Number(sumData.awaySum) };
+          });
+        }
+      });
     };
     if (pid) {
       getData(pid as string);

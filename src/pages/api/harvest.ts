@@ -11,26 +11,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   const client = new MongoClient(uri);
   const db = client.db('betting');
 
-  try {
-    await client.connect();
-    if (req.method === 'GET') {
-    } else if (req.method === 'POST') {
-    } else if (req.method === 'PUT') {
-      const { address, _id, isValidated, winner, canHarvestValue } = req.body;
+  await client.connect();
+  if (req.method === 'GET') {
+  } else if (req.method === 'POST') {
+  } else if (req.method === 'PUT') {
+    try {
+      const { address, _id, harvestValue, harvestHash } = req.body;
 
       const gameInfo = await db.collection(address).findOneAndUpdate(
         { _id: new ObjectId(_id) },
         {
-          $set: { isValidated, winner, canHarvestValue },
+          $set: { isHarvested: true, harvestValue, harvestHash },
         },
       );
-      console.log(gameInfo, 'info');
 
       client.close();
-      res.status(200).json({ data: '123123' });
+      res.status(200).json({ data: gameInfo });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ data: 'ooj' });
     }
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ data: 'ooj' });
   }
 }

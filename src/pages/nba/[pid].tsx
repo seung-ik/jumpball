@@ -37,6 +37,7 @@ const NbaPage = () => {
     const getData = async (_id: string) => {
       const _data = await fetchNbaSummaryById(_id);
       setData(_data);
+
       axios.get('/api/game', { params: { gameId: `NBA-${pid}` } }).then(({ data }) => {
         const sumData = data.data;
         if (sumData) {
