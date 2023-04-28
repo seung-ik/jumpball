@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { NBAEventType } from '@pages/index';
 import { parseTimeToUsTime } from './parser';
 import { DetailGameInfoType } from '@pages/nba/[pid]';
+import { QueryFunctionContext } from 'react-query';
 
 const NBA_SCOREBOARD_URL = (_date: string) => {
   return `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${_date}`;
@@ -107,4 +108,33 @@ export async function fetchMlbSummaryById(_id: string): Promise<DetailGameInfoTy
   }
 
   return _data;
+}
+
+export async function getBetInfo(config: QueryFunctionContext<any[], any>) {
+  const type = config.queryKey[1] as string;
+  const id = config.queryKey[2] as string;
+  const { data: _gameBetInfo } = await axios.get('/api/game', {
+    params: { gameId: `${type}-${id}` },
+  });
+  return _gameBetInfo;
+}
+
+export async function getDetailGameInfo(config: QueryFunctionContext<any[], any>) {
+  const type = config.queryKey[1];
+  const id = config.queryKey[2] as string;
+  let data;
+  if (type === 'NBA') {
+    data = await fetchNbaSummaryById(id);
+  } else if (type === 'MLB') {
+    data = await fetchMlbSummaryById(id);
+  }
+
+  return data;
+}
+
+export async function getGameList(config: QueryFunctionContext<any[], any>) {
+  const _date = config.queryKey[1] as Date;
+  const _tab = config.queryKey[2] as 'NBA' | 'MLB';
+  const gameList = await fetchScoreBoardByDate(_date, _tab);
+  return gameList;
 }

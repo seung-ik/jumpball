@@ -1,12 +1,12 @@
+import React from 'react';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import GamePrediction from '@components/jumpball/GamePrediction';
+import { useQuery } from 'react-query';
 import { format } from 'date-fns';
-import { fetchMlbSummaryById } from '@utils/fetch';
-import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import styled from 'styled-components';
 import { IoIosArrowBack } from 'react-icons/io';
-import axios from 'axios';
+import { getDetailGameInfo } from '@utils/fetch';
+import GamePrediction from '@components/jumpball/GamePrediction';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -27,26 +27,7 @@ export interface DetailGameInfoType {
 const MlbPage = () => {
   const router = useRouter();
   const { pid } = router.query;
-  const [data, setData] = useState<DetailGameInfoType>();
-
-  useEffect(() => {
-    const getData = async (_id: string) => {
-      const _data = await fetchMlbSummaryById(_id);
-      setData(_data);
-
-      axios.get('/api/game', { params: { gameId: `MLB-${pid}` } }).then(({ data }) => {
-        const sumData = data.data;
-        if (sumData) {
-          setData((prev: any) => {
-            return { ...prev, homeSum: Number(sumData.homeSum), awaySum: Number(sumData.awaySum) };
-          });
-        }
-      });
-    };
-    if (pid) {
-      getData(pid as string);
-    }
-  }, [pid]);
+  const { data } = useQuery(['detail_game_info_key', 'MLB', pid], getDetailGameInfo);
 
   if (!data) return;
   return (

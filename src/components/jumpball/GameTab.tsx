@@ -1,19 +1,22 @@
 import React from 'react';
 import { format } from 'date-fns';
 import styled from 'styled-components';
-import { NBAEventType } from '@pages/index';
+import { useQuery } from 'react-query';
+import { BsArrowLeftSquare, BsArrowRightSquare } from 'react-icons/bs';
+import { useAppSelector } from '@store/index';
 import NoGames from '@components/jumpball/NoGames';
 import GameItem from '@components/jumpball/GameItem';
 import { PRIMARY_COLOR } from '@constants/style';
-import { BsArrowLeftSquare, BsArrowRightSquare } from 'react-icons/bs';
+import { getGameList } from '@utils/fetch';
 
 interface Props {
-  gameList: NBAEventType[];
-  date: Date;
   handleDate: (_type: 'today' | 'add' | 'sub') => void;
 }
 
-const GameTab: React.FC<Props> = ({ gameList, date, handleDate }) => {
+const GameTab: React.FC<Props> = ({ handleDate }) => {
+  const { date, tab } = useAppSelector((state) => state.page);
+  const { data: gameList } = useQuery(['game_list_key', date, tab], getGameList);
+
   return (
     <>
       <Row>
@@ -24,8 +27,8 @@ const GameTab: React.FC<Props> = ({ gameList, date, handleDate }) => {
           <BsArrowRightSquare size={32} onClick={() => handleDate('add')} />
         </DateWrapper>
       </Row>
-      {gameList.length === 0 && <NoGames />}
-      {gameList.map((game: any) => (
+      {gameList?.length === 0 && <NoGames />}
+      {gameList?.map((game: any) => (
         <GameItem key={game.id} {...game} />
       ))}
     </>

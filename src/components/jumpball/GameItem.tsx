@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { NBAEventType } from '@pages/index';
 import ScoreBoard from './ScoreBoard';
-import { TRANS_GREEN, SECONDARY_COLOR, PRIMARY_COLOR } from '@constants/style';
+import { TRANS_GREEN, SECONDARY_COLOR } from '@constants/style';
 import { BsBoxArrowInRight } from 'react-icons/bs';
 import styled from 'styled-components';
 import { format } from 'date-fns';
@@ -28,7 +28,7 @@ const GameItem: React.FC<NBAEventType> = ({
     if (type === 'NBA') router.push(`/nba/${id}`);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (completed) setActive(true);
   }, [completed]);
 
@@ -91,7 +91,7 @@ const Box = styled('div')`
   padding: 20px 24px;
 `;
 
-const Head = styled('head')<{ isCompleted: boolean }>`
+const Head = styled('header')<{ isCompleted: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;

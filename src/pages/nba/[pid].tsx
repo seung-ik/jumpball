@@ -1,14 +1,14 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import GamePrediction from '@components/jumpball/GamePrediction';
+import React from 'react';
 import { format } from 'date-fns';
-import { fetchNbaSummaryById } from '@utils/fetch';
-import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
 import { IoIosArrowBack } from 'react-icons/io';
+import { getDetailGameInfo } from '@utils/fetch';
 import NbaTable from '@components/jumpball/NbaTable';
 import NbaStatistics from '@components/jumpball/NbaStatistics';
-import axios from 'axios';
+import GamePrediction from '@components/jumpball/GamePrediction';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -31,26 +31,7 @@ export interface DetailGameInfoType {
 const NbaPage = () => {
   const router = useRouter();
   const { pid } = router.query;
-  const [data, setData] = useState<DetailGameInfoType>();
-
-  useEffect(() => {
-    const getData = async (_id: string) => {
-      const _data = await fetchNbaSummaryById(_id);
-      setData(_data);
-
-      axios.get('/api/game', { params: { gameId: `NBA-${pid}` } }).then(({ data }) => {
-        const sumData = data.data;
-        if (sumData) {
-          setData((prev: any) => {
-            return { ...prev, homeSum: Number(sumData.homeSum), awaySum: Number(sumData.awaySum) };
-          });
-        }
-      });
-    };
-    if (pid) {
-      getData(pid as string);
-    }
-  }, [pid]);
+  const { data } = useQuery(['detail_game_info_key', 'NBA', pid], getDetailGameInfo);
 
   if (!data) return;
   return (

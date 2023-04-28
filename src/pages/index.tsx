@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import MyTab from '@components/jumpball/MyTab';
 import GameTab from '@components/jumpball/GameTab';
 import TabButton from '@atoms/TabButton';
-import { fetchScoreBoardByDate } from '@utils/fetch';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import { useAppDispatch, useAppSelector } from '@store/index';
 import pageSlice, { JumpBallTab } from '@store/pageSlice';
@@ -22,10 +21,9 @@ export interface NBAEventType {
 }
 
 const JumpBall = () => {
-  const { date, tab } = useAppSelector((state) => state.page);
+  const { tab } = useAppSelector((state) => state.page);
   const { address } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const [gameList, setGameList] = useState<NBAEventType[]>([]);
 
   const handleDate = (_type: 'today' | 'add' | 'sub') => {
     if (_type === 'today') dispatch(pageSlice.actions.setDate(new Date()));
@@ -42,18 +40,6 @@ const JumpBall = () => {
   };
 
   useEffect(() => {
-    const getGameList = async () => {
-      if (tab !== 'MY') {
-        const gameList = await fetchScoreBoardByDate(date, tab);
-        setGameList(gameList);
-      } else {
-        setGameList([]);
-      }
-    };
-    getGameList();
-  }, [date, tab]);
-
-  useEffect(() => {
     if (address) {
       dispatch(fetchUserBettingList());
     }
@@ -66,13 +52,7 @@ const JumpBall = () => {
         <TabButton tab={tab} handleTab={handleTab} name="MLB" value="MLB" />
         <TabButton tab={tab} handleTab={handleTab} name="나의 예측" value="MY" />
       </Header>
-      <Body>
-        {tab === 'MY' ? (
-          <MyTab />
-        ) : (
-          <GameTab gameList={gameList} date={date} handleDate={handleDate} />
-        )}
-      </Body>
+      <Body>{tab === 'MY' ? <MyTab /> : <GameTab handleDate={handleDate} />}</Body>
     </Layout>
   );
 };
