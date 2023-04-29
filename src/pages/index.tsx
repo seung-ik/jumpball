@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import MyTab from '@components/jumpball/MyTab';
 import GameTab from '@components/jumpball/GameTab';
 import TabButton from '@atoms/TabButton';
-import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH, BACK_COLOR } from '@constants/style';
 import { useAppDispatch, useAppSelector } from '@store/index';
 import pageSlice, { JumpBallTab } from '@store/pageSlice';
 import { fetchUserBettingList } from '@store/userSlice';
+import Footer from '@articles/Footer';
 
 export interface NBAEventType {
   id: string;
@@ -53,6 +54,7 @@ const JumpBall = () => {
         <TabButton tab={tab} handleTab={handleTab} name="나의 예측" value="MY" />
       </Header>
       <Body>{tab === 'MY' ? <MyTab /> : <GameTab handleDate={handleDate} />}</Body>
+      <Footer />
     </Layout>
   );
 };
@@ -94,6 +96,8 @@ const Header = styled('header')`
 
 const Body = styled('section')`
   margin-top: 80px;
-  margin-bottom: 140px;
   padding: 0 24px;
+  min-height: calc(100vh - 180px);
 `;
+
+
