@@ -14,7 +14,7 @@ import { ethereum } from './UserStatus';
 const ConnectedWallet = () => {
   const [isSmall, setIsSmall] = useState<boolean>(true);
   const [isCopy, setIsCopy] = useState<boolean>(false);
-  const userInfo = useAppSelector((state) => state.user);
+  const { address, chainId } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   const toggleSize = () => setIsSmall((prev) => !prev);
@@ -25,10 +25,10 @@ const ConnectedWallet = () => {
   };
 
   const onClickCopy = async () => {
-    if (userInfo.address) {
+    if (address) {
       setIsCopy(true);
       navigator.clipboard
-        .writeText(userInfo.address) //
+        .writeText(address) //
         .then(() =>
           setTimeout(() => {
             setIsCopy(false);
@@ -37,17 +37,18 @@ const ConnectedWallet = () => {
     }
   };
 
-  const onClickOpenLink = () =>
-    window.open(`https://mumbai.polygonscan.com/address/${userInfo.address}`);
+  const onClickOpenLink = () => window.open(`https://mumbai.polygonscan.com/address/${address}`);
 
   useEffect(() => {
     const handleNetworkChanged = async (chainId: string) => {
       const network = parseChainId(parseInt(chainId, 16));
       if (!network) {
         alert('지원하지않는 체인입니다.');
+        localStorage.removeItem('_account');
         dispatch(userSlice.actions.reset());
       } else {
         const { address, token, chainId } = await getWalletInfo(ethereum);
+        console.log(chainId);
         dispatch(userSlice.actions.setUser({ address, token, chainId }));
       }
     };
@@ -70,14 +71,14 @@ const ConnectedWallet = () => {
       {isSmall ? (
         <SmallBox onClick={toggleSize}>
           <CiWallet size={28} />
-          <span className="text">{parseShortAddress(userInfo.address)}</span>
+          <span className="text">{parseShortAddress(address)}</span>
         </SmallBox>
       ) : (
         <LargeBox>
-          <div>Network : {parseChainId(userInfo.chainId)}</div>
+          <div>Network : {parseChainId(chainId)}</div>
           <IconText>
             <span>Address : </span>
-            <span style={{ color: isCopy ? 'white' : 'black' }}>{userInfo.address}</span>
+            <span style={{ color: isCopy ? 'white' : 'black' }}>{address}</span>
             <AiOutlineCopy size={20} onClick={onClickCopy} />
           </IconText>
 
