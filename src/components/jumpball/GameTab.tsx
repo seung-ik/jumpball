@@ -6,7 +6,7 @@ import { BsArrowLeftSquare, BsArrowRightSquare } from 'react-icons/bs';
 import { useAppSelector } from '@store/index';
 import NoGames from '@components/jumpball/NoGames';
 import GameItem from '@components/jumpball/GameItem';
-import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
+import { PRIMARY_COLOR } from '@constants/style';
 import { getGameList } from '@utils/fetch';
 
 interface Props {

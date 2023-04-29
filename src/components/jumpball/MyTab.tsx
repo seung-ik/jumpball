@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppSelector, useAppDispatch } from '@store/index';
-import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
+import { PRIMARY_COLOR, TRANS_GREEN, TRANS_ORANGE, TRANS_YELLOW } from '@constants/style';
 import { getJumpBallContract } from '@utils/wallet';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import { calcCanHarvestValue } from '@utils/calc';
 import pageSlice from '@store/pageSlice';
+import { fetchUserBettingList } from '@store/userSlice';
 
 export interface ResponseMyBetting {
   _id: string;
@@ -18,10 +19,10 @@ export interface ResponseMyBetting {
   away: string;
   home: string;
   pick: boolean;
-  isValidated?: boolean;
-  winner?: string;
-  harvestValue?: number;
-  isHarvested?: boolean;
+  isValidated: boolean;
+  winner: string;
+  harvestValue: number;
+  isHarvested: boolean;
 }
 
 const MyTab = () => {
@@ -34,8 +35,12 @@ const MyTab = () => {
       const Contract = await getJumpBallContract();
       const tx = await Contract.harvest(_gameId);
       const receipt = await tx.wait();
-      // console.log(receipt, 'receipt');
-      axios.put('/api/harvest', { address, _id: _id, harvestValue: 0, harvestHash: receipt.hash });
+      await axios.put('/api/harvest', {
+        address,
+        _id: _id,
+        harvestHash: receipt.hash,
+      });
+      dispatch(fetchUserBettingList());
     } catch (err) {
       console.error(err);
       alert(err);
@@ -47,7 +52,15 @@ const MyTab = () => {
 
     const tx = await Contract.getGameInfo(_gameId);
     const validator = tx[9];
-    const winner = Number(tx[8]) > 0 ? 'HOME' : 'AWAY';
+    let winner;
+    if (Number(tx[5]) === 1) {
+      winner = 'HOME';
+    } else if (Number(tx[5]) === 2) {
+      winner = 'AWAY';
+    } else {
+      alert('경기종료후 검증이 등록되지 않았습니다.(종료일 이후 자정등록)');
+      return;
+    }
     const homeSum = ethers.formatEther(tx[6]);
     const awaySum = ethers.formatEther(tx[7]);
     const harvestValue = calcCanHarvestValue(
@@ -62,7 +75,14 @@ const MyTab = () => {
     if (!isValidated) {
       alert('경기종료후 검증이 등록되지 않았습니다.(종료일 이후 자정등록)');
     } else {
-      axios.put('/api/hello', { isValidated, address, _id: _id, winner, harvestValue });
+      await axios.put('/api/hello', {
+        isValidated,
+        address,
+        _id: _id,
+        winner,
+        harvestValue,
+      });
+      dispatch(fetchUserBettingList());
     }
   };
 
@@ -90,8 +110,11 @@ const MyTab = () => {
       </Head>
       <Body>
         {bettingList.map((el) => {
+          const complete_success = el.isValidated && el.isHarvested;
+          const complete_fail = el.isValidated && !el.harvestValue;
+
           return (
-            <Row key={el._id}>
+            <Row key={el._id} success={complete_success} fail={complete_fail}>
               <Span flex={2.4}>{format(new Date(el.gameDate), 'yy/MM/dd')}</Span>
               <Span flex={3.2}>{el.gameId}</Span>
               <Span className="team-name" flex={3.4}>
@@ -108,12 +131,22 @@ const MyTab = () => {
               <Span flex={3}>
                 <ButtonWrapper>
                   <Button
-                    disabled={el.isValidated}
+                    disabled={el.isValidated || new Date(el.gameDate) > new Date()}
                     onClick={() => onClickVerify(el._id, el.gameId, el.pick, el.value)}
                   >
-                    검증
+                    확인
                   </Button>
-                  <Button onClick={() => onClickHarvest(el._id, el.gameId)}>수확</Button>
+                  <Button
+                    disabled={
+                      !el.isValidated ||
+                      new Date(el.gameDate) > new Date() ||
+                      (el.isValidated && el.isHarvested) ||
+                      (el.isValidated && !el.harvestValue)
+                    }
+                    onClick={() => onClickHarvest(el._id, el.gameId)}
+                  >
+                    수확
+                  </Button>
                 </ButtonWrapper>
               </Span>
             </Row>
@@ -146,7 +179,7 @@ const Span = styled('span')<{ flex: number }>`
   text-align: center;
 `;
 
-const Row = styled('div')`
+const Row = styled('div')<{ success?: boolean; fail?: boolean }>`
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${TRANS_GREEN};
@@ -161,6 +194,18 @@ const Row = styled('div')`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  ${({ success }) =>
+    success &&
+    css`
+      background: ${TRANS_GREEN};
+    `}
+
+  ${({ fail }) =>
+    fail &&
+    css`
+      background: ${TRANS_ORANGE};
+    `}
 `;
 
 const ButtonWrapper = styled('div')`

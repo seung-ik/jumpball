@@ -16,12 +16,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   } else if (req.method === 'POST') {
   } else if (req.method === 'PUT') {
     try {
-      const { address, _id, harvestValue, harvestHash } = req.body;
+      const { address, _id, harvestHash } = req.body;
 
       const gameInfo = await db.collection(address).findOneAndUpdate(
         { _id: new ObjectId(_id) },
         {
-          $set: { isHarvested: true, harvestValue, harvestHash },
+          $set: { isHarvested: true, harvestHash },
         },
       );
 

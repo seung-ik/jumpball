@@ -7,5 +7,6 @@ export const SECONDARY_COLOR = '#fc6238';
 export const TRANS_ORANGE = 'rgba(252, 98, 56, 0.2)';
 
 export const THIRD_COLOR = '#ffd300';
+export const TRANS_YELLOW = 'rgba(255, 211, 0, 0.2)';
 
 export const BACK_COLOR = '#ededed';
