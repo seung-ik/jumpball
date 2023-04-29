@@ -18,54 +18,62 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       .collection(address as string)
       .find()
       .toArray();
-    // const result = await db.collection("users").findOne({ name: "test" });
+
     client.close();
     res.status(200).json(result);
   } else if (req.method === 'POST') {
     try {
       const { address, gameDate, gameId, home, away, pick, value, bettingHash } = req.body;
 
-      await db.collection(address).insertOne({
-        gameDate,
-        gameId,
-        home,
-        away,
-        pick,
-        value,
-        bettingHash,
-        isValidated: false,
-        winner: '',
-        harvestValue: 0,
-        isHarvested: false,
-        harvestHash: '',
-      });
+      const savedBetInfo = await db.collection(address).findOne({ gameId, pick });
+      if (!savedBetInfo) {
+        await db.collection(address).insertOne({
+          gameDate,
+          gameId,
+          home,
+          away,
+          pick,
+          value: Number(value),
+          bettingHash: [bettingHash],
+          isValidated: false,
+          winner: '',
+          harvestValue: 0,
+          isHarvested: false,
+          harvestHash: '',
+        });
+      } else {
+        await db.collection(address).updateOne(
+          { gameId, pick },
+          {
+            $inc: {
+              value: Number(value),
+            },
+            $push: {
+              bettingHash: bettingHash,
+            },
+          },
+        );
+      }
 
       const savedGame = await db.collection('game').findOne({ gameId });
-
       if (!savedGame) {
         await db.collection('game').insertOne({
           gameId,
-          homeSum: pick ? value : 0,
-          awaySum: !pick ? value : 0,
+          homeSum: pick ? Number(value) : 0,
+          awaySum: !pick ? Number(value) : 0,
         });
-      } else {
-        const newHomeSum = pick
-          ? Number(savedGame.homeSum) + Number(value)
-          : Number(savedGame.homeSum);
-        const newAwaySum = !pick
-          ? Number(savedGame.awaySum) + Number(value)
-          : Number(savedGame.awaySum);
-        await db
-          .collection('game')
-          .findOneAndUpdate({ gameId }, { $set: { homeSum: newHomeSum, awaySum: newAwaySum } });
+      } else if (savedGame && pick) {
+        await db.collection('game').updateOne({ gameId }, { $inc: { homeSum: Number(value) } });
+      } else if (savedGame && !pick) {
+        await db.collection('game').updateOne({ gameId }, { $inc: { awaySum: Number(value) } });
       }
+
+      client.close();
+      res.status(200).json({ data: 'success' });
     } catch (err) {
       console.error(err);
       res.status(400).json({ data: 'fail' });
     }
-
-    client.close();
-    res.status(200).json({ data: 'success' });
   } else if (req.method === 'PUT') {
     const { address, _id, isValidated, winner, harvestValue } = req.body;
 
