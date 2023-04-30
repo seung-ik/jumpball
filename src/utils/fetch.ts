@@ -70,7 +70,11 @@ export async function fetchNbaSummaryById(_id: string): Promise<DetailGameInfoTy
     series: data.header.competitions[0].series,
     homeSum: 0,
     awaySum: 0,
+    homePlayer: [],
+    awayPlayer: [],
   };
+  // _data.homePlayer = data.boxscore.players[1].statistics;
+  // _data.awayPlayer = data.boxscore.players[0].statistics;
 
   if (new Date(gameDate) >= new Date()) {
     _data.lastGames_home = data.lastFiveGames[0].events.reverse();
@@ -100,7 +104,11 @@ export async function fetchMlbSummaryById(_id: string): Promise<DetailGameInfoTy
     series: data.header.competitions[0].series,
     homeSum: 0,
     awaySum: 0,
+    homePlayer: [],
+    awayPlayer: [],
   };
+  _data.homePlayer = data.boxscore.players[1].statistics;
+  _data.awayPlayer = data.boxscore.players[0].statistics;
 
   if (new Date(gameDate) >= new Date()) {
     _data.lastGames_home = data.lastFiveGames[0].events.reverse();

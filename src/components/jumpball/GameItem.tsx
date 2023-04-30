@@ -84,7 +84,7 @@ export default GameItem;
 
 const Box = styled('div')`
   border: 2px solid ${TRANS_GREEN};
-  border-radius: 12px;
+  border-radius: 8px;
   height: auto;
   margin-bottom: 20px;
   background: white;

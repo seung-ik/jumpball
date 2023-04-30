@@ -45,7 +45,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'FT') {
           return (
-            <Row marginBottom="24px">
+            <Row marginBottom="24px" key={statistic.label}>
               <div>
                 {data.boxscore_home[i]['displayValue']} ({data.boxscore_home[i + 1]['displayValue']}
                 %)
@@ -81,7 +81,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Defensive Rebounds') {
           return (
-            <Row marginBottom="24px">
+            <Row marginBottom="24px" key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>수비 리바운드</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>
@@ -111,7 +111,7 @@ const NbaStatistics: React.FC<Props> = ({ data }) => {
 
         if (statistic.label === 'Blocks') {
           return (
-            <Row marginBottom="24px">
+            <Row marginBottom="24px" key={statistic.label}>
               <div>{data.boxscore_home[i]['displayValue']}</div>
               <div>블락</div>
               <div>{data.boxscore_away[i]['displayValue']}</div>

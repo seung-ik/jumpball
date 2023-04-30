@@ -7,6 +7,8 @@ import { IoIosArrowBack } from 'react-icons/io';
 import { getDetailGameInfo } from '@utils/fetch';
 import GamePrediction from '@components/jumpball/GamePrediction';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
+import MlbTable from '@components/jumpball/MlbTable';
+import MlbStatistics from '@components/jumpball/MlbStatistics';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -22,6 +24,8 @@ export interface DetailGameInfoType {
   date: any;
   location: string;
   series: any[];
+  homePlayer: any[];
+  awayPlayer: any[];
 }
 
 const MlbPage = () => {
@@ -47,7 +51,7 @@ const MlbPage = () => {
           <div className="series-wrapper">
             {data.series.map((el) => {
               return (
-                <div key={el.summary}>
+                <div key={el.summary + el.description}>
                   <div className="info-title" style={{ marginBottom: '4px' }}>
                     {el.title}
                   </div>
@@ -61,9 +65,8 @@ const MlbPage = () => {
           <GamePrediction isHome data={data} />
           <GamePrediction isHome={false} data={data} />
         </div>
-        {data.isStarted && <div style={{ marginTop: '40px' }}>경기기록 준비중...</div>}
-        {/* {data.isStarted && <NbaTable data={data} />}
-        {data.isStarted && <NbaStatistics data={data} />} */}
+        {data.isStarted && <MlbTable data={data} />}
+        {data.isStarted && <MlbStatistics data={data} />}
       </Body>
     </Layout>
   );

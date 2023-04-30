@@ -7,10 +7,12 @@ import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
 
 interface Props {
   data: any[];
+  type: string;
 }
 
-const NbaLatestGames: React.FC<Props> = ({ data }) => {
+const NbaLatestGames: React.FC<Props> = ({ data, type }) => {
   const router = useRouter();
+  console.log(type);
 
   return (
     <Wrapper>
@@ -22,7 +24,16 @@ const NbaLatestGames: React.FC<Props> = ({ data }) => {
             <div className="date">{date}</div>
             <div className="result">{el.gameResult}</div>
             <div className="score">{el.score}</div>
-            <div className="versus" onClick={() => router.push(`/nba/${el.id}`)}>
+            <div
+              className="versus"
+              onClick={() => {
+                if (type === 'NBA') {
+                  router.push(`/nba/${el.id}`);
+                } else if (type === 'MLB') {
+                  router.push(`/mlb/${el.id}`);
+                }
+              }}
+            >
               {el.opponent.displayName}
             </div>
           </GameWrapper>

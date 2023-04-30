@@ -46,7 +46,7 @@ const GamePrediction: React.FC<Props> = ({ isHome, data }) => {
   return (
     <Box>
       <TeamIntroduction data={introduction} />
-      {!data.isStarted && <NbaLatestGames data={latestGames} />}
+      {!data.isStarted && <NbaLatestGames data={latestGames} type={data.type} />}
       <BetWrapper>
         <Column>
           <div className="bet-header">참여수량</div>

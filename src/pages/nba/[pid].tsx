@@ -26,12 +26,15 @@ export interface DetailGameInfoType {
   series: any[];
   homeSum: number;
   awaySum: number;
+  homePlayer: any[];
+  awayPlayer: any[];
 }
 
 const NbaPage = () => {
   const router = useRouter();
   const { pid } = router.query;
   const { data } = useQuery(['detail_game_info_key', 'NBA', pid], getDetailGameInfo);
+  console.log(data);
 
   if (!data) return;
   return (
