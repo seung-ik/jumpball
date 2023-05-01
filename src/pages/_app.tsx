@@ -6,6 +6,8 @@ import RootLayout from '@layout/RootLayout';
 import GlobalStyle from '@styles/GlobalStyle';
 import dynamic from 'next/dynamic';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
   ssr: false,
 });
@@ -32,6 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <UserStatus />
           <RootLayout>
             <GlobalStyle />
+            <ToastContainer />
             <Component {...pageProps} />
           </RootLayout>
         </QueryClientProvider>

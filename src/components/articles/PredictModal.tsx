@@ -10,6 +10,8 @@ import { TRANS_ORANGE, SECONDARY_COLOR, TRANS_GREEN, PRIMARY_COLOR } from '@cons
 import InfoText from '@atoms/InfoText';
 import { useMutation, useQueryClient } from 'react-query';
 import { postBettingSuccessCallback } from '@utils/fetch';
+import { toast } from 'react-toastify';
+import LoadingSpinner from '@components/atoms/Loading';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -22,6 +24,7 @@ interface Props {
 const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal, awayTotal }) => {
   const userInfo = useAppSelector((state) => state.user);
   const [value, setValue] = useState<string>('0.001');
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { mutate } = useMutation(postBetting, {
     onSuccess: () => postBettingSuccessCallback(queryClient, data, isHome, value),
@@ -67,6 +70,7 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
     const gameName = data.gameNote || 'Regular Season';
     const homeTeam = data.home.team.displayName;
     const awayTeam = data.away.team.displayName;
+    setIsLoading(true);
 
     try {
       const tx: any = await Contract.betting(
@@ -94,9 +98,16 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
         bettingHash: receipt.hash,
       };
       mutate(params);
+      toast.success('transaction success !', {
+        position: toast.POSITION.BOTTOM_CENTER,
+      });
     } catch (err) {
       console.error(err);
+      toast.error('transaction fail !', {
+        position: toast.POSITION.BOTTOM_CENTER,
+      });
     } finally {
+      setIsLoading(false);
       onClickCloseModal();
     }
   };
@@ -139,6 +150,23 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
             )}
           </InfoWrapper>
         </Section>
+        {isLoading && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: `${TRANS_GREEN}`,
+            }}
+          >
+            <LoadingSpinner />
+          </div>
+        )}
 
         <BtnWrapper>
           <Button onClick={onClickBetting} disabled={isExceed || !Number(value)}>
@@ -166,13 +194,14 @@ const ModalLayout = styled('div')`
 `;
 
 const Modal = styled('div')`
-  border: 2px solid ${SECONDARY_COLOR};
+  border: 2px solid ${PRIMARY_COLOR};
   background-color: white;
   opacity: 1;
   display: flex;
   flex-direction: column;
   padding: 24px;
   border-radius: 12px;
+  position: relative;
 
   & .title {
     font-size: 24px;
