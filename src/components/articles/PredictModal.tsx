@@ -1,17 +1,17 @@
 import React, { useState, useMemo } from 'react';
-import axios from 'axios';
 import { ethers } from 'ethers';
 import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
+import { useMutation, useQueryClient } from 'react-query';
+import InfoText from '@atoms/InfoText';
 import { useAppSelector } from '@store/index';
 import { getJumpBallContract } from '@utils/wallet';
 import { calcPredictDividedRate } from '@utils/calc';
-import { TRANS_ORANGE, SECONDARY_COLOR, TRANS_GREEN, PRIMARY_COLOR } from '@constants/style';
-import InfoText from '@atoms/InfoText';
-import { useMutation, useQueryClient } from 'react-query';
-import { postBettingSuccessCallback } from '@utils/fetch';
-import { toast } from 'react-toastify';
 import LoadingSpinner from '@components/atoms/Loading';
+import useNumInputChange from '@/hook/useNumInputChange';
+import { postBetting, postBettingSuccessCallback } from '@utils/fetch';
+import { TRANS_ORANGE, SECONDARY_COLOR, TRANS_GREEN, PRIMARY_COLOR } from '@constants/style';
 
 interface Props {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,45 +23,26 @@ interface Props {
 
 const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal, awayTotal }) => {
   const userInfo = useAppSelector((state) => state.user);
-  const [value, setValue] = useState<string>('0.001');
+
+  const [value, setValue, onChange] = useNumInputChange('0.001');
   const [isLoading, setIsLoading] = useState(false);
+
+  const maxValue = (Number(userInfo.token) * 0.97).toFixed(3);
+  const isExceed = value > maxValue;
+  const selectedData = isHome ? data.home : data.away;
+
   const queryClient = useQueryClient();
   const { mutate } = useMutation(postBetting, {
     onSuccess: () => postBettingSuccessCallback(queryClient, data, isHome, value),
   });
-  const maxValue = (Number(userInfo.token) * 0.97).toFixed(3);
-  const isExceed = value > maxValue;
-
-  async function postBetting(_params: any) {
-    return await axios.post('/api/hello', _params);
-  }
-
-  const selectedData = isHome ? data.home : data.away;
 
   const dividendRate = useMemo(() => {
     if (!Number(value)) return 0;
     return calcPredictDividedRate(isHome, homeTotal, awayTotal, Number(value));
   }, [homeTotal, awayTotal, value, isHome]);
-
-  const onChangeInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    let inputVal = event.target.value;
-    if (!/^[\d.]*$/.test(inputVal)) return;
-    if (inputVal.split('.').length > 2) return;
-
-    const inputNumber = parseFloat(inputVal);
-    if (isNaN(inputNumber)) {
-      setValue('0');
-      return;
-    }
-
-    const limitedNumber = Math.floor(inputNumber * 1000) / 1000;
-    if (limitedNumber !== inputNumber) {
-      inputVal = limitedNumber.toFixed(3);
-    }
-    if (/^0[0-9]/.test(inputVal)) {
-      inputVal = inputVal.slice(1);
-    }
-    setValue(inputVal);
+  const onClickCloseModal = () => {
+    setIsShowModal(false);
+    setValue('');
   };
 
   const onClickBetting = async () => {
@@ -74,12 +55,12 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
 
     try {
       const tx: any = await Contract.betting(
-        `${data.type}-${data.id}`,
-        _date,
-        gameName,
-        homeTeam,
-        awayTeam,
-        isHome,
+        `${data.type}-${data.id}`, // type and id
+        _date, // date
+        gameName, // name
+        homeTeam, // homeTeam name
+        awayTeam, // awayTeam name
+        isHome, // my betting
         {
           value: ethers.parseEther(String(value)),
           gasLimit: 300000,
@@ -112,18 +93,13 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
     }
   };
 
-  const onClickCloseModal = () => {
-    setIsShowModal(false);
-    setValue('');
-  };
-
   return (
     <ModalLayout onClick={onClickCloseModal}>
       <Modal onClick={(e) => e.stopPropagation()}>
         <Section>
           <span className="title">참여수량 입력</span>
           <InputWrapper>
-            <input type="text" value={value} onChange={onChangeInput} />
+            <input type="text" value={value} onChange={onChange} />
             <button onClick={() => setValue('0.001')}>최소</button>
             <button onClick={() => setValue((Number(userInfo.token) * 0.5).toFixed(3))}>
               절반
@@ -150,23 +126,6 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
             )}
           </InfoWrapper>
         </Section>
-        {isLoading && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: `${TRANS_GREEN}`,
-            }}
-          >
-            <LoadingSpinner />
-          </div>
-        )}
 
         <BtnWrapper>
           <Button onClick={onClickBetting} disabled={isExceed || !Number(value)}>
@@ -174,6 +133,11 @@ const PredictModal: React.FC<Props> = ({ setIsShowModal, data, isHome, homeTotal
           </Button>
           <Button onClick={onClickCloseModal}>취소</Button>
         </BtnWrapper>
+        {isLoading && (
+          <LoadingWrapper>
+            <LoadingSpinner />
+          </LoadingWrapper>
+        )}
       </Modal>
     </ModalLayout>
   );
@@ -282,4 +246,16 @@ const Button = styled('button')`
     color: rgb(187, 190, 202);
     cursor: default;
   }
+`;
+
+const LoadingWrapper = styled('div')`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${TRANS_GREEN};
 `;

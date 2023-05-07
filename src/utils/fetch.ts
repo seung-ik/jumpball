@@ -166,3 +166,7 @@ export function postBettingSuccessCallback(
     }
   });
 }
+
+export async function postBetting(_params: any) {
+  return await axios.post('/api/hello', _params);
+}

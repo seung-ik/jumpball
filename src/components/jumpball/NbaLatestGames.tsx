@@ -12,7 +12,6 @@ interface Props {
 
 const NbaLatestGames: React.FC<Props> = ({ data, type }) => {
   const router = useRouter();
-  console.log(type);
 
   return (
     <Wrapper>
