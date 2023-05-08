@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import ReactGA from 'react-ga';
+import Script from 'next/script';
 
 const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
   ssr: false,
@@ -18,6 +19,8 @@ const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
+  const ga_code = process.env.NEXT_PUBLIC_GA_ID as string;
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -28,8 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
   });
 
   useEffect(() => {
-    const code = process.env.NEXT_PUBLIC_GA_ID as string; 
-    ReactGA.initialize(code); // 추적 ID를 여기에 입력합니다.
+    ReactGA.initialize(ga_code); // 추적 ID를 여기에 입력합니다.
     ReactGA.pageview(window.location.pathname + window.location.search);
 
     // 페이지 이동 시에도 Google Analytics에 페이지를 추적하도록 설정합니다.
@@ -45,6 +47,24 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${ga_code}`}
+      />
+      <Script
+        id="gtag-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${ga_code}', {
+              page_path: window.location.pathname,
+            });
+          `,
+        }}
+      />
       <Head>
         <title>JumpBall | Beta</title>
         <meta name="description" content="seungik" />
