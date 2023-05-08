@@ -10,8 +10,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
-import ReactGA from 'react-ga';
 import Script from 'next/script';
+import * as gtag from '../lib/gtag';
 
 const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
   ssr: false,
@@ -19,7 +19,6 @@ const UserStatus = dynamic(() => import('../components/articles/UserStatus'), {
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const ga_code = process.env.NEXT_PUBLIC_GA_ID as string;
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,25 +30,20 @@ export default function App({ Component, pageProps }: AppProps) {
   });
 
   useEffect(() => {
-    ReactGA.initialize(ga_code); // 추적 ID를 여기에 입력합니다.
-    ReactGA.pageview(window.location.pathname + window.location.search);
-
-    // 페이지 이동 시에도 Google Analytics에 페이지를 추적하도록 설정합니다.
     const handleRouteChange = (url: any) => {
-      ReactGA.pageview(url);
+      gtag.pageview(url);
     };
     router.events.on('routeChangeComplete', handleRouteChange);
-
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange);
     };
-  }, []);
+  }, [router.events]);
 
   return (
     <>
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${ga_code}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
       />
       <Script
         id="gtag-init"
@@ -59,7 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${ga_code}', {
+            gtag('config', '${gtag.GA_TRACKING_ID}', {
               page_path: window.location.pathname,
             });
           `,
