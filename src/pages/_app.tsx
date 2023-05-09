@@ -60,6 +60,15 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
       <Head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7066838750664656"
+          crossOrigin="anonymous"
+        />
+        <meta
+          name="google-site-verification"
+          content="XG5LaYu-fml4gVOv6AbQTZmzBz7SfH-7Rd-JosB35WM"
+        />
         <title>JumpBall | Beta</title>
         <meta name="description" content="seungik" />
         <link rel="icon" href="/favicon.ico" />
