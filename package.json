@@ -40,6 +40,8 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "ethers": "^6.3.0",
+    "globby": "^13.1.4",
+    "next-sitemap": "^4.0.9",
     "prettier": "^2.8.7",
     "typechain": "^8.1.1"
   }
