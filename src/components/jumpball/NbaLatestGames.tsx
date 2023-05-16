@@ -4,6 +4,7 @@ import { DetailGameInfoType } from '@pages/nba/[pid]';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
+import Link from 'next/link';
 
 interface Props {
   data: any[];
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const NbaLatestGames: React.FC<Props> = ({ data, type }) => {
-  const router = useRouter();
+  const url = type === 'NBA' ? 'nba' : 'mlb';
 
   return (
     <Wrapper>
@@ -23,18 +24,9 @@ const NbaLatestGames: React.FC<Props> = ({ data, type }) => {
             <div className="date">{date}</div>
             <div className="result">{el.gameResult}</div>
             <div className="score">{el.score}</div>
-            <div
-              className="versus"
-              onClick={() => {
-                if (type === 'NBA') {
-                  router.push(`/nba/${el.id}`);
-                } else if (type === 'MLB') {
-                  router.push(`/mlb/${el.id}`);
-                }
-              }}
-            >
-              {el.opponent.displayName}
-            </div>
+            <Link href={`${url}/${el.id}`}>
+              <div className="versus">{el.opponent.displayName}</div>
+            </Link>
           </GameWrapper>
         );
       })}
@@ -89,5 +81,6 @@ const GameWrapper = styled('div')`
     flex: 1.5;
     text-align: right;
     cursor: pointer;
+    text-decoration: none;
   }
 `;

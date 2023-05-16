@@ -1,5 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { NBAEventType } from '@pages/index';
 import ScoreBoard from './ScoreBoard';
@@ -7,6 +6,7 @@ import { TRANS_GREEN, SECONDARY_COLOR } from '@constants/style';
 import { BsBoxArrowInRight } from 'react-icons/bs';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 const GameItem: React.FC<NBAEventType> = ({
   name,
@@ -18,15 +18,16 @@ const GameItem: React.FC<NBAEventType> = ({
   date,
   type,
 }) => {
-  const router = useRouter();
+  const href = useMemo(() => {
+    if (type === 'MLB') {
+      return `/mlb/${id}`;
+    } else {
+      return `/nba/${id}`;
+    }
+  }, [id, type]);
   const [active, setActive] = useState<boolean>(false);
 
   const onClickBoxToggle = () => setActive((prev) => !prev);
-  const onClickDetailPage: React.MouseEventHandler<HTMLElement> = (e) => {
-    e.stopPropagation();
-    if (type === 'MLB') router.push(`/mlb/${id}`);
-    if (type === 'NBA') router.push(`/nba/${id}`);
-  };
 
   useLayoutEffect(() => {
     if (completed) setActive(true);
@@ -49,9 +50,11 @@ const GameItem: React.FC<NBAEventType> = ({
             <span>경기종료</span>
           </div>
         ) : (
-          <div className="uncomplete" onClick={onClickDetailPage}>
-            <span>승부예측</span>
-            <BsBoxArrowInRight size={28} color={SECONDARY_COLOR} />
+          <div className="uncomplete" onClick={(e) => e.stopPropagation()}>
+            <Link href={href}>
+              <span>승부예측</span>
+              <BsBoxArrowInRight size={28} color={SECONDARY_COLOR} />
+            </Link>
           </div>
         )}
       </Head>
@@ -63,11 +66,13 @@ const GameItem: React.FC<NBAEventType> = ({
             <ScoreBoard isHome={false} info={awayTeam} />
           </ScoreBoardWrapper>
           {completed ? (
-            <div className="complete">
+            <div className="complete" onClick={(e) => e.stopPropagation()}>
               <span className="location">
                 경기시간: {format(new Date(date), 'hh:mm')} | 경기장: {location}
               </span>
-              <button onClick={onClickDetailPage}>결과 상세보기</button>
+              <Link href={href}>
+                <button>결과 상세보기</button>
+              </Link>
             </div>
           ) : (
             <span className="location">

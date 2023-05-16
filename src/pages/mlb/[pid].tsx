@@ -9,6 +9,8 @@ import GamePrediction from '@components/jumpball/GamePrediction';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import MlbTable from '@components/jumpball/MlbTable';
 import MlbStatistics from '@components/jumpball/MlbStatistics';
+import Link from 'next/link';
+import Head from 'next/head';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -36,9 +38,15 @@ const MlbPage = () => {
   if (!data) return;
   return (
     <Layout>
-      <Header onClick={() => router.push('/')}>
-        <IoIosArrowBack />
-        <span>경기일정</span>
+      <Head>
+        <title>경기세부내용 | Jumpball</title>
+        <meta name="description" content="경기를 예측하고 세부 결과를 알수 있는 공간입니다." />
+      </Head>
+      <Header>
+        <Link href="/">
+          <IoIosArrowBack />
+          <span>경기일정</span>
+        </Link>
       </Header>
       <Body>
         <Info>
