@@ -6,7 +6,7 @@ import { TRANS_GREEN, SECONDARY_COLOR } from '@constants/style';
 import { BsBoxArrowInRight } from 'react-icons/bs';
 import styled from 'styled-components';
 import { format } from 'date-fns';
-import Link from 'next/link';
+import CustomLink from '@components/atoms/CustomLink';
 
 const GameItem: React.FC<NBAEventType> = ({
   name,
@@ -50,12 +50,12 @@ const GameItem: React.FC<NBAEventType> = ({
             <span>경기종료</span>
           </div>
         ) : (
-          <div className="uncomplete" onClick={(e) => e.stopPropagation()}>
-            <Link href={href}>
+          <CustomLink href={href}>
+            <div className="uncomplete" onClick={(e) => e.stopPropagation()}>
               <span>승부예측</span>
               <BsBoxArrowInRight size={28} color={SECONDARY_COLOR} />
-            </Link>
-          </div>
+            </div>
+          </CustomLink>
         )}
       </Head>
       {active && (
@@ -70,9 +70,9 @@ const GameItem: React.FC<NBAEventType> = ({
               <span className="location">
                 경기시간: {format(new Date(date), 'hh:mm')} | 경기장: {location}
               </span>
-              <Link href={href}>
+              <CustomLink href={href}>
                 <button>결과 상세보기</button>
-              </Link>
+              </CustomLink>
             </div>
           ) : (
             <span className="location">
@@ -107,7 +107,7 @@ const Head = styled('header')<{ isCompleted: boolean }>`
     align-items: center;
   }
 
-  & > .uncomplete {
+  & .uncomplete {
     display: flex;
     align-items: center;
     gap: 8px;

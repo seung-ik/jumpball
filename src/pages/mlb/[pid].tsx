@@ -3,14 +3,13 @@ import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
 import { format } from 'date-fns';
 import styled from 'styled-components';
-import { IoIosArrowBack } from 'react-icons/io';
 import { getDetailGameInfo } from '@utils/fetch';
 import GamePrediction from '@components/jumpball/GamePrediction';
 import { PRIMARY_COLOR, TRANS_GREEN, MAX_WIDTH } from '@constants/style';
 import MlbTable from '@components/jumpball/MlbTable';
 import MlbStatistics from '@components/jumpball/MlbStatistics';
-import Link from 'next/link';
 import Head from 'next/head';
+import ScheduleBtn from '@articles/ScheduleBtn';
 
 export interface DetailGameInfoType {
   type: 'NBA' | 'MLB';
@@ -42,12 +41,7 @@ const MlbPage = () => {
         <title>경기세부내용 | Jumpball</title>
         <meta name="description" content="경기를 예측하고 세부 결과를 알수 있는 공간입니다." />
       </Head>
-      <Header>
-        <Link href="/">
-          <IoIosArrowBack />
-          <span>경기일정</span>
-        </Link>
-      </Header>
+      <ScheduleBtn />
       <Body>
         <Info>
           <div>
@@ -90,21 +84,6 @@ const Layout = styled('div')`
   flex-direction: column;
   margin: auto;
   min-height: 100vh;
-`;
-
-const Header = styled('button')`
-  display: flex;
-  height: 72px;
-  align-items: center;
-  padding-left: 24px;
-  font-size: 24px;
-  background-color: ${PRIMARY_COLOR};
-  color: white;
-  border-radius: 0 0 0 8px;
-
-  & span {
-    margin-left: 16px;
-  }
 `;
 
 const Body = styled('div')`

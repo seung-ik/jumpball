@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { DetailGameInfoType } from '@pages/nba/[pid]';
 import { format } from 'date-fns';
-import { useRouter } from 'next/router';
 import { PRIMARY_COLOR, TRANS_GREEN } from '@constants/style';
-import Link from 'next/link';
+import CustomLink from '@atoms/CustomLink';
 
 interface Props {
   data: any[];
@@ -24,9 +22,9 @@ const NbaLatestGames: React.FC<Props> = ({ data, type }) => {
             <div className="date">{date}</div>
             <div className="result">{el.gameResult}</div>
             <div className="score">{el.score}</div>
-            <Link href={`${url}/${el.id}`}>
+            <CustomLink href={`${url}/${el.id}`}>
               <div className="versus">{el.opponent.displayName}</div>
-            </Link>
+            </CustomLink>
           </GameWrapper>
         );
       })}
